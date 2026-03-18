@@ -19,6 +19,7 @@ function Home() {
     })
     // console.log(filtered)
     const ALL_TAGS = ["all", "work", "personal", "ideas", "archive"];
+
     const TAG_COLORS = {
         work: { bg: "#1e3a5f", text: "#60a5fa", dot: "#3b82f6" },
         personal: { bg: "#2d1b4e", text: "#c084fc", dot: "#a855f7" },
@@ -227,7 +228,7 @@ function Home() {
                                             Tags
                                         </div>
                                         {
-                                            ALL_TAGS.map((tag) => (
+                                            ALL_TAGS.slice(1,6).map((tag) => (
                                                 <div className='flex items-center gap-2 px-3 py-[7px] text-xs cursor-pointer transition-colors hover:bg-[#222] font-dm'
                                                     key={tag}
                                                     onClick={() => toggleTag(tag, selectedId)}
