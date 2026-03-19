@@ -56,6 +56,7 @@ function useNote() {
                 throw new Error(data.message || data.error);
             }
             setNotes((prev) => [data.note, ...prev]);
+            return data.note
         } catch (error) {
             console.log("Error:", error.message);
             setError(error.message);

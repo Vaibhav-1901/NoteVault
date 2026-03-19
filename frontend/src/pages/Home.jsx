@@ -47,6 +47,10 @@ function Home() {
         if (hrs < 24) return `${hrs}h ago`;
         return `${Math.floor(hrs / 24)}d ago`;
     }
+    const handleAddNote = async () => {
+       const res= await addNote();
+       setSelectedId(res.id);
+    }
     useEffect(() => {
         if (!loading) {
             if (notes?.length == 0) {
@@ -57,7 +61,16 @@ function Home() {
             }
 
         }
-    }, [notes])
+    }, [loading])
+
+    useEffect(() => {
+    if (!loading && notes?.length > 0) {
+        const stillExists = notes.find(n => n.id === selectedId);
+        if (!stillExists) {
+            setSelectedId(notes[0].id);
+        }
+    }
+}, [notes]);
 
     useEffect(() => {
         if (!selectedNote) return;
@@ -88,7 +101,7 @@ function Home() {
                                 </span>
                             </div>
                             <button
-                                onClick={addNote}
+                                onClick={handleAddNote}
                                 title="New note"
                                 className="bg-[#1e1e1e] border border-[#2a2a2a] text-[#aaa] rounded-md w-7 h-7 flex items-center justify-center hover:bg-[#2a2a2a] transition-colors cursor-pointer"
                             >
