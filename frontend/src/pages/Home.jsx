@@ -2,7 +2,9 @@ import React, { use } from 'react'
 import { useEffect } from 'react';
 import { useState } from 'react';
 import useNote from '../hooks/useNote.js';
-
+import { BASE_URL } from '../../constants.js';
+import { useUser } from '../context/UserContext.jsx';
+import { useNavigate } from "react-router-dom";
 function Home() {
 
     const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -27,6 +29,9 @@ function Home() {
         books: { bg: "#3b2a1a", text: "#fb923c", dot: "#f97316" },
         archive: { bg: "#1a1a1a", text: "#FFFFFF", dot: "#555" },
     };
+    const navigate = useNavigate();
+    const { user, userloading } = useUser();
+
     if (error) {
         return (
             <div className='bg-black text-red-700'>
@@ -48,8 +53,8 @@ function Home() {
         return `${Math.floor(hrs / 24)}d ago`;
     }
     const handleAddNote = async () => {
-       const res= await addNote();
-       setSelectedId(res.id);
+        const res = await addNote();
+        setSelectedId(res.id);
     }
     useEffect(() => {
         if (!loading) {
@@ -64,13 +69,13 @@ function Home() {
     }, [loading])
 
     useEffect(() => {
-    if (!loading && notes?.length > 0) {
-        const stillExists = notes.find(n => n.id === selectedId);
-        if (!stillExists) {
-            setSelectedId(notes[0].id);
+        if (!loading && notes?.length > 0) {
+            const stillExists = notes.find(n => n.id === selectedId);
+            if (!stillExists) {
+                setSelectedId(notes[0].id);
+            }
         }
-    }
-}, [notes]);
+    }, [notes]);
 
     useEffect(() => {
         if (!selectedNote) return;
@@ -81,6 +86,22 @@ function Home() {
 
         return () => clearTimeout(timeout);
     }, [selectedNote]);
+
+    const handleLogout = async () => {
+        try {
+            const res = await fetch(`${BASE_URL}/api/users/logout`, {
+                method: "POST",
+                credentials: "include"
+            })
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.message || "Logout failed");
+            }
+            navigate("/")
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    }
     return (
         <>
             <div className="flex h-screen bg-[#111111] text-[#e0e0e0] overflow-hidden font-mono fade-in w-full ">
@@ -208,14 +229,33 @@ function Home() {
                                     </div>
                                 </div>
                             ))}
+
+                        </div>
+                        {/* UserInfo */}
+                        <div className="flex items-center justify-between p-5   border-t border-[#1f1f1f]">
+                            {userloading ? (
+                                <h1 className="text-white/70">Loading...</h1>
+                            ) : (
+                                <h1 className="text-white/70">
+                                    {user ? user.username : "Guest"}
+                                </h1>
+                            )}
+                            <div className="flex items-center gap-4">
+                                <button onClick={handleLogout} className="text-white/40 hover:text-red-400 p-1.5 rounded-md flex items-center justify-center  hover:bg-[#1e1e1e] transition-colors cursor-pointer border-none bg-transparent">
+                                    logout
+                                </button>
+                            </div>
                         </div>
                     </aside>
                 )}
                 {/* Main Full Note */}
                 <main className='flex-1 flex flex-col h-full  overflow-hidden relative  '>
+                    {/* UserHeader */}
+
+
                     {/* Tools */}
 
-                    <div className={` items-center md:px-10 px-4 py-3 border-b border-[#1a1a1a] gap-1 relative flex  ${sidebarVisible? 'justify-end' : 'justify-between'} md:justify-between`}>
+                    <div className={` items-center md:px-10 px-4 py-3 border-b border-[#1a1a1a] gap-1 relative flex  ${sidebarVisible ? 'justify-end' : 'justify-between'} md:justify-between`}>
                         <button className={` ${sidebarVisible ? 'hidden' : 'md:flex'} text-[#444] p-1.5 rounded-md md:flex items-center justify-center hover:text-[#e0e0e0] hover:bg-[#1e1e1e] transition-colors cursor-pointer border-none bg-transparent `}
                             onClick={() => setSidebarVisible((prev) => !prev)}
                             title="Toggle sidebar">
@@ -241,7 +281,7 @@ function Home() {
                                             Tags
                                         </div>
                                         {
-                                            ALL_TAGS.slice(1,6).map((tag) => (
+                                            ALL_TAGS.slice(1, 6).map((tag) => (
                                                 <div className='flex items-center gap-2 px-3 py-[7px] text-xs cursor-pointer transition-colors hover:bg-[#222] font-dm'
                                                     key={tag}
                                                     onClick={() => toggleTag(tag, selectedId)}
