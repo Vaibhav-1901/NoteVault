@@ -1,8 +1,8 @@
-# NoteFlow
+# NoteVault
 
 A clean, minimal, dark-themed notes app focused on distraction-free writing with instant auto-save and real-time filtering.
 
-→ [note-flow-eight-neon.vercel.app](https://note-flow-eight-neon.vercel.app)
+→ [note-flow-eight-neon.vercel.app](https://note-vault-eight-neon.vercel.app)
 
 ## 🚀 Features
 - Sidebar + editor layout — note list on the left, writing area on the right
