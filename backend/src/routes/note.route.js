@@ -3,7 +3,7 @@ import { createNote , getAllNotes,editNote,deleteNote,getSingleNote,getSessionNo
 
 const noteRouter=Router();
 noteRouter.route("/create").post(createNote);
-noteRouter.route("/").get(getAllNotes);
+noteRouter.route("/:userId").get(getAllNotes);
 noteRouter.route("/:id").get(getSingleNote);
 noteRouter.route("/edit/:id").put(editNote);
 noteRouter.route("/delete/:id").delete(deleteNote);

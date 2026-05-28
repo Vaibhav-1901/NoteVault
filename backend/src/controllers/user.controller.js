@@ -66,11 +66,11 @@ const loginUser = async function (req, res) {
     //give access token
 
     try {
-        const { email, password } = req.body;
+        const { username ,email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ $or: [{ email }, { username }] });
         if (!user) {
             return res.status(400).json({ message: "User does not exist please register" });
         }

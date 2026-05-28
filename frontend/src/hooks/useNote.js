@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { BASE_URL } from "../../constants";
 import socket from "../socket/socket.js";
+import { useUser } from "../context/UserContext.jsx";
 function useNote(options = {}) {
     const [notes, setNotes] = useState([]);
     const { isCollaborative, sessionId } = options;
     const [error, setError] = useState();
+    const { user, userLoading } = useUser();
     const [loading, setLoading] = useState(true);
     const fetchNotes = async () => {
         try {
-            const res = await fetch(`${BASE_URL}/api/notes/`)
+            const res = await fetch(`${BASE_URL}/api/notes/${user._id}`)
             const data = await res.json();
             if (!res.ok) {
                 throw new Error(data.message || 'Failed to get notes')
@@ -81,14 +83,20 @@ function useNote(options = {}) {
         }
     }
     useEffect(() => {
+        if (userLoading) return;
         if (!isCollaborative) {
-            fetchNotes();
+            if (user?._id) {
+                fetchNotes();
+            }
         }
         else {
-            fetchSessionNotes();
+            if (sessionId) {
+                fetchSessionNotes();
+            }
+
         }
 
-    }, [isCollaborative, sessionId])
+    }, [isCollaborative, sessionId,userLoading,user])
     const saveNote = async (newNote, options = {}) => {
         try {
             const { isCollaborative, sessionId } = options;

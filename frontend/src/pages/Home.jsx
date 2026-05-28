@@ -6,6 +6,7 @@ import { BASE_URL } from '../../constants.js';
 import { useUser } from '../context/UserContext.jsx';
 import { useCollab } from '../context/CollabContext.jsx';
 import { useNavigate } from "react-router-dom";
+import CollabModal from '../components/CollabModal.jsx';
 function Home() {
 
     const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -24,6 +25,7 @@ function Home() {
         const matchSearch = !search || note.title?.toLowerCase().includes(search.toLowerCase()) || note.content?.toLowerCase().includes(search.toLowerCase())
         return matchTag && matchSearch;
     })
+    const [showCollabModal, setShowCollabModal] = useState(false);
 
     // console.log(filtered)
     const ALL_TAGS = ["all", "work", "personal", "ideas", "archive"];
@@ -371,6 +373,15 @@ function Home() {
                 {showTagPicker && (
                     <div className="fixed inset-0 z-40" onClick={() => setShowTagPicker(false)} />
                 )}
+                <button
+                    className="fixed bottom-5 right-5 bg-[#1e1e1e] border border-[#2a2a2a] text-[#aaa] rounded-md w-20 h-10 flex items-center justify-center hover:bg-[#2a2a2a] transition-colors cursor-pointer z-50 md:hidden"
+                    onClick={() => setShowCollabModal(true)}>
+                    Collab
+                </button>
+                {showCollabModal && (
+                    <CollabModal onClose={() => setShowCollabModal(false)} />
+                )}
+
             </div>
         </>
     )

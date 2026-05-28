@@ -22,7 +22,8 @@ const createNote= async(req,res)=>{
 
 const getAllNotes= async(req,res)=>{
     try{
-        const notes= await Note.find().sort({createdAt: -1});
+        const {userId}=req.params;
+        const notes= await Note.find({userId}).sort({createdAt: -1});
         if(!notes){
             return res.status(400).json({message:"No Notes Found"});
         }

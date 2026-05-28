@@ -6,7 +6,7 @@ import {useCollab} from "../context/CollabContext.jsx";
 
  import {
     X, Users, Plus, LogIn,
-    Copy, Chck, ArrowLeft, Wifi
+    Copy, Check, ArrowLeft, Wifi
 } from "lucide-react";
 
 
@@ -43,7 +43,7 @@ function CollabModal({ onClose }) {
             setMode("joined");
             setSessionId(sessionId);
             setLoading(false);
-            onClose(sessionId); //what is onClose? its to close the modal and open collab page
+            onClose(); //what is onClose? its to close the modal and open collab page
         })
         socket.on("error", ({ message }) => {
             setLoading(false);
@@ -57,7 +57,7 @@ function CollabModal({ onClose }) {
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-                onClick={() => onClose(null)}
+                onClick={onClose}
             />
 
             {/* Modal */}
@@ -82,7 +82,7 @@ function CollabModal({ onClose }) {
                         </div>
                     </div>
                     <button
-                        onClick={() => onClose(null)}
+                        onClick={onClose}
                         className="w-7 h-7 rounded-md flex items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/5 transition-all"
                     >
                         <X size={14} />
@@ -172,7 +172,7 @@ function CollabModal({ onClose }) {
                             </div>
 
                             <button
-                                onClick={() => onClose(sessionId)}
+                                onClick={onClose}
                                 className="flex items-center justify-center gap-2 w-full bg-white text-black font-semibold text-sm py-3 rounded-xl hover:bg-white/90 transition-all"
                             >
                                 <Wifi size={14} />
