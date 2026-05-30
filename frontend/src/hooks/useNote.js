@@ -8,9 +8,10 @@ function useNote(options = {}) {
     const [error, setError] = useState();
     const { user, userLoading } = useUser();
     const [loading, setLoading] = useState(true);
+    // console.log("Session ID in useNote: ", sessionId);
     const fetchNotes = async () => {
         try {
-            const res = await fetch(`${BASE_URL}/api/notes/${user._id}`)
+            const res = await fetch(`${BASE_URL}/api/notes/user/${user._id}`)
             const data = await res.json();
             if (!res.ok) {
                 throw new Error(data.message || 'Failed to get notes')
@@ -27,12 +28,14 @@ function useNote(options = {}) {
     };
     const fetchSessionNotes = async () => {
         try {
-            const res = await fetch(`${BASE_URL}/api/notes/${sessionId}/notes`);
+            setLoading(true);
+            console.log("Inside for session ID: ", sessionId);
+            const res = await fetch(`${BASE_URL}/api/notes/session/${sessionId}`);
             const data = await res.json();
             if (!res.ok) {
                 throw new Error(data.message || 'Failed to fetch session notes');
             }
-            console.log("Session Notes:", data.notes);
+             console.log("Session Notes:", data.notes);
             setNotes(data.notes);
         } catch (error) {
             console.error("Error fetching session notes:", error.message);
@@ -83,6 +86,7 @@ function useNote(options = {}) {
         }
     }
     useEffect(() => {
+        console.log("useEffect in useNote called with sessionId: ", sessionId, " and isCollaborative: ", isCollaborative);
         if (userLoading) return;
         if (!isCollaborative) {
             if (user?._id) {
@@ -91,6 +95,7 @@ function useNote(options = {}) {
         }
         else {
             if (sessionId) {
+                console.log("Fetching notes for session: ", sessionId);
                 fetchSessionNotes();
             }
 

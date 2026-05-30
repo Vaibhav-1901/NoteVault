@@ -1,5 +1,6 @@
 import { Note } from "../models/note.model.js";
 import { User } from "../models/user.model.js";
+import { Session } from "../models/session.model.js";
 const createNote= async(req,res)=>{
     try{
         const{title,content,userId,sessionId}=req.body;
@@ -85,12 +86,21 @@ const deleteNote= async(req,res)=>{
 const getSessionNotes=async(req,res)=>{
     try {
         const {sessionId}=req.params;
-        const notes=await Note.find({sessionId}).sort({updatedAt:-1});
+        const session = await Session.findOne({sessionId}).sort({updatedAt:-1});
+        if(!session){
+            console.log("No session found with ID:", sessionId);
+            return res.status(400).json({message:"No Session Found for this ID"});
+        }
+        console.log("Session found:", session);
+        console.log("Got session:", session._id);
+        const notes = await Note.find({sessionId:session._id}).sort({updatedAt:-1});
         if(!notes){
+            console.log("No notes found for session:", sessionId);
             return res.status(400).json({message:"No Notes Found for this session"});
         }
         return res.status(200).json({notes});   
     } catch (error) {
+        console.log("Error fetching session notes:", error.message);
         return res.status(400).json({error:error.message});
     }
 }

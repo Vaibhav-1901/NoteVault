@@ -37,7 +37,7 @@ const initializeSocket=(server)=>{
             //join session
             socket.on("joinSession",async({sessionId,userId})=>{
                 try {
-                    const session=await Session.findById(sessionId);
+                    const session=await Session.findOne({ sessionId });
                     if(!session){
                         socket.emit("error", { message: "Room not found" });
                         return;
@@ -62,7 +62,7 @@ const initializeSocket=(server)=>{
         //NOTE ADDED TO SESSION
         socket.on("note-updated",async({note,sessionId})=>{
             try {
-                const session=await Session.findById(sessionId);
+                const session=await Session.findOne({ sessionId });
                 if(!session){
                     socket.emit("error", { message: "Session not found" });
                     return;
@@ -99,12 +99,12 @@ const initializeSocket=(server)=>{
 
         async function handleLeave(socket,sessionId,userId){
             try {
-                await Session.findByIdAndUpdate(
-                    sessionId,
-                    {$pull:{members:userId}}
-                )//removing from the memvbers
-                socket.leave(sessionId); // remove the user from the room
-                socket.to(sessionId).emit("userLeft",{userId}); // telling other users in the session that a user has left 
+                await Session.findOneAndUpdate(
+                    { sessionId },
+                    { $pull: { members: userId } }
+                );
+                socket.leave(sessionId);
+                socket.to(sessionId).emit("userLeft", { userId });
             } catch (error) {
                 socket.emit("error", { message: error.message });
                 console.error("Error leaving session:", error);

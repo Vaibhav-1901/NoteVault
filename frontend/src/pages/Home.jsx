@@ -12,6 +12,7 @@ function Home() {
     const [sidebarVisible, setSidebarVisible] = useState(true);
     const [activeTag, setActiveTag] = useState("all");
     const { sessionId } = useCollab();
+    // console.log("Session ID in Home:", sessionId);
     const [selectedId, setSelectedId] = useState(null);
     const { notes, error, addNote, deleteNote, editContent, toggleTag, changeTitle, saveNote, loading } = useNote({
         isCollaborative: !!sessionId,
@@ -39,6 +40,7 @@ function Home() {
     };
     const navigate = useNavigate();
     const { user, userloading } = useUser();
+    console.log(notes);
 
     if (error) {
         return (
@@ -208,7 +210,7 @@ function Home() {
                                         className="text-[11px] truncate leading-snug mb-2"
                                         style={{ color: note.id === selectedId ? "#555" : "#3a3a3a" }}
                                     >
-                                        {note.content.slice(0, 60).replace(/\n/g, " ") || "No content"}
+                                        {note.content?.slice(0, 60).replace(/\n/g, " ") || "No content"}
                                     </div>
 
                                     <div className="flex items-center justify-between">
@@ -374,7 +376,7 @@ function Home() {
                     <div className="fixed inset-0 z-40" onClick={() => setShowTagPicker(false)} />
                 )}
                 <button
-                    className="fixed bottom-5 right-5 bg-[#1e1e1e] border border-[#2a2a2a] text-[#aaa] rounded-md w-20 h-10 flex items-center justify-center hover:bg-[#2a2a2a] transition-colors cursor-pointer z-50 md:hidden"
+                    className="fixed bottom-5 right-5 bg-[#1e1e1e] border border-[#2a2a2a] text-[#aaa] rounded-md w-20 h-10 flex items-center justify-center hover:bg-[#2a2a2a] transition-colors cursor-pointer z-50 "
                     onClick={() => setShowCollabModal(true)}>
                     Collab
                 </button>

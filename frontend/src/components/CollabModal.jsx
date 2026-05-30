@@ -12,11 +12,12 @@ import {useCollab} from "../context/CollabContext.jsx";
 
 
 function CollabModal({ onClose }) {
-    // const { user } = useUser();
+    const { user } = useUser();
     const { sessionId, setSessionId } = useCollab();
-    const [mode, setMode] = useState("join");
+    const [mode, setMode] = useState("");
     const [loading, setLoading] = useState(false);
     const[inputSessionId,setInputSessionId]=useState("");
+    const [copied, setCopied] = useState(false);
 
     const handleCreate = () => {
         socket.connect();
@@ -50,6 +51,10 @@ function CollabModal({ onClose }) {
             console.log("Error joining session:", message);
         });
 
+    }
+    const handleCopy=async()=>{
+        await navigator.clipboard.writeText(sessionId);
+        setCopied(true);
     }
 
     return (
