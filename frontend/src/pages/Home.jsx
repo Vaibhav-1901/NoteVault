@@ -8,20 +8,23 @@ import { useCollab } from '../context/CollabContext.jsx';
 import { useNavigate } from "react-router-dom";
 import CollabModal from '../components/CollabModal.jsx';
 import useCollaboration from '../hooks/useCollaboration.jsx';
+import { useRef } from 'react';
+import SessionMembers from '../components/SessionMembers.jsx';
 function Home() {
 
     const [sidebarVisible, setSidebarVisible] = useState(true);
     const { user, userloading } = useUser();
     const [activeTag, setActiveTag] = useState("all");
     const { sessionId } = useCollab();
-    
+
     // console.log("Session ID in Home:", sessionId);
     const [selectedId, setSelectedId] = useState(null);
-    const { notes, error, addNote, deleteNote, editContent, toggleTag, changeTitle, saveNote, loading ,setNotes} = useNote({
+    const { notes, error, addNote, deleteNote, editContent, toggleTag, changeTitle, saveNote, loading, setNotes } = useNote({
         isCollaborative: !!sessionId,
         sessionId
     });
-    const{members}=useCollaboration(sessionId,user?._id,setNotes);
+    const isRemoteUpdate = useRef(false);
+    const { members } = useCollaboration(sessionId, user?._id, setNotes, isRemoteUpdate);
     const [showTagPicker, setShowTagPicker] = useState(false);
     const [search, setSearch] = useState("");
     const selectedNote = notes?.find(note => note.id === selectedId);
@@ -43,7 +46,7 @@ function Home() {
         archive: { bg: "#1a1a1a", text: "#FFFFFF", dot: "#555" },
     };
     const navigate = useNavigate();
-    
+
     console.log(notes);
 
     if (error) {
@@ -92,18 +95,24 @@ function Home() {
     }, [notes]);
 
     useEffect(() => {
+        console.log("SAVE EFFECT");
         if (!selectedNote) return;
+        if (isRemoteUpdate.current) {
+            isRemoteUpdate.current = false;
+            return;
+        }
+        const delay = sessionId ? 75 : 800;
         const timeout = setTimeout(() => {
-            if(sessionId){
+            if (sessionId) {
                 saveNote(selectedNote, {
                     isCollaborative: true,
                     sessionId,
                 });
             }
-            else{
+            else {
                 saveNote(selectedNote);
             }
-        }, 800);
+        }, delay);
 
         return () => clearTimeout(timeout);
     }, [selectedNote]);
@@ -395,6 +404,7 @@ function Home() {
                 {showCollabModal && (
                     <CollabModal onClose={() => setShowCollabModal(false)} />
                 )}
+                <SessionMembers />
 
             </div>
         </>

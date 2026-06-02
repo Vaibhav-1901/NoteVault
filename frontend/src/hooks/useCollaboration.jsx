@@ -3,9 +3,8 @@ import socket from "../socket/socket.js";
 import useNote from "./useNote.js";
 
 
-const useCollaboration = (sessionId, userId,setNotes) => {
+const useCollaboration = (sessionId, userId, setNotes, isRemoteUpdate) => {
     const [members, setMembers] = useState([]);//have userId
-    const [isConnected, setIsConnected] = useState(false);
     // const isBroadcasting = useRef(false); // prevent  loop // rather use id matching to prevent loop
     console.log("useCollaboration mounted");
     console.log("sessionId:", sessionId);
@@ -14,9 +13,6 @@ const useCollaboration = (sessionId, userId,setNotes) => {
     useEffect(() => {
         if (!sessionId || !userId) return;
         setIsConnected(true); //marking UI as connected to the session
-        socket.onAny((event, ...args) => {
-            console.log("EVENT RECEIVED:", event, args);
-        });
         socket.on("userJoined", ({ userId }) => {
             console.log("SOMEONE NEW JOINED")
             setMembers((prevMembers) => [...prevMembers, userId]);
@@ -26,14 +22,19 @@ const useCollaboration = (sessionId, userId,setNotes) => {
             setMembers((prevMembers) => prevMembers.filter((id) => id !== userId));
         })
         socket.on("user-updated-note", ({ note, updatedBy }) => {
-            console.log("someone has edited a note: ", note);
+            console.log("REMOTE UPDATE");
             if (updatedBy === userId) return; //using in place of isBrodcast to prevent loop //CAN ALSO simply use socket.to(sessionId).emit instead of io.emit in the backend to prevent sending the update to the user who made the change
+            isRemoteUpdate.current = true;
             setNotes((prevNotes) => prevNotes.map((n) => n.id === note.id ? note : n));
         })
+        socket.on("sessionMembers", ({ members }) => {
+            setAllMembers(members);
+        });
         return () => {
             socket.off("userJoined");
             socket.off("userLeft");
             socket.off("user-updated-note");
+            socket.off("sessionMembers");
         };
 
     }, [sessionId, userId])

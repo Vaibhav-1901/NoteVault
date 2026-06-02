@@ -2,6 +2,8 @@ import { Server } from 'socket.io';
 import { nanoid } from 'nanoid';
 import { Session } from '../models/session.model.js';
 import { Note } from '../models/note.model.js';
+import {useCollab} from '../hooks/useCollaboration.js';
+
 const initializeSocket = (server) => {
     const io = new Server(server, {
         cors: {
@@ -51,16 +53,7 @@ const initializeSocket = (server) => {
                     userId,
                 }
                 socket.join(sessionId);
-                const sockets = await io.in(sessionId).fetchSockets();
-
-                console.log(
-                    "Room members:",
-                    sockets.map(s => ({
-                        socketId: s.id,
-                        userId: s.data.userId
-                    }))
-                );
-
+                socket.emit("sessionMembers", { members: session.members });//sending the current members of the session to the user who just joined
                 socket.emit("sessionJoined", { sessionId });// telling the user that they have joined the session
                 console.log("User joined session: ", sessionId);
                 console.log("Broadcasting userJoined to room:", sessionId);
