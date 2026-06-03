@@ -1,25 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 import socket from "../socket/socket.js";
 import useNote from "./useNote.js";
-
+import { useCollab } from '../context/CollabContext.jsx';
 
 const useCollaboration = (sessionId, userId, setNotes, isRemoteUpdate) => {
-    const [members, setMembers] = useState([]);//have userId
+    //have userId
     // const isBroadcasting = useRef(false); // prevent  loop // rather use id matching to prevent loop
     console.log("useCollaboration mounted");
     console.log("sessionId:", sessionId);
     console.log("userId:", userId);
+    const { allMembers, setAllMembers, onlineMembers, setOnlineMembers } = useCollab();
 
     useEffect(() => {
         if (!sessionId || !userId) return;
         setIsConnected(true); //marking UI as connected to the session
         socket.on("userJoined", ({ userId }) => {
             console.log("SOMEONE NEW JOINED")
-            setMembers((prevMembers) => [...prevMembers, userId]);
+            // setAllMembers((prevMembers) => [...new Set([...prevMembers, userId])]);
         })
         socket.on("userLeft", ({ userId }) => {
             console.log("SOMEONE LEFT")
-            setMembers((prevMembers) => prevMembers.filter((id) => id !== userId));
+            setAllMembers((prevMembers) => prevMembers.filter((id) => id !== userId));
         })
         socket.on("user-updated-note", ({ note, updatedBy }) => {
             console.log("REMOTE UPDATE");
@@ -30,6 +31,9 @@ const useCollaboration = (sessionId, userId, setNotes, isRemoteUpdate) => {
         socket.on("sessionMembers", ({ members }) => {
             setAllMembers(members);
         });
+        socket.on("onlineMembers", (members) => {
+            setOnlineMembers(members);
+        })
         return () => {
             socket.off("userJoined");
             socket.off("userLeft");

@@ -6,8 +6,9 @@ const CollabContext=createContext();
 export const CollabProvider=({children})=>{
     const [sessionId,setSessionId]=useState(null);
     const [allMembers,setAllMembers]=useState([]);
+    const[onlineMembers,setOnlineMembers]=useState([]);
     return (
-        <CollabContext.Provider value={{sessionId,setSessionId,allMembers,setAllMembers}}>
+        <CollabContext.Provider value={{sessionId,setSessionId,allMembers,setAllMembers,onlineMembers,setOnlineMembers}}>
             {children}
         </CollabContext.Provider>
     )

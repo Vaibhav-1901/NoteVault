@@ -2,7 +2,8 @@ import { Server } from 'socket.io';
 import { nanoid } from 'nanoid';
 import { Session } from '../models/session.model.js';
 import { Note } from '../models/note.model.js';
-import {useCollab} from '../hooks/useCollaboration.js';
+
+const activeUsers = new Map();
 
 const initializeSocket = (server) => {
     const io = new Server(server, {
@@ -44,16 +45,28 @@ const initializeSocket = (server) => {
                     socket.emit("error", { message: "Room not found" });
                     return;
                 }
-                if (!session.members.includes(userId)) {
+                const alreadyMember = session.members.some(
+                    member => member.toString() === userId
+                );
+                
+                if (!alreadyMember) {
                     session.members.push(userId);
                     await session.save();
                 }
+                const updatedSession = await Session.findOne({ sessionId }).populate("members", "username");
+                const userJoined = updatedSession.members.find(member => member._id.toString() === userId);
+                const username = userJoined.username;
                 socket.data = {
                     sessionId,
                     userId,
                 }
+                if (!activeUsers.has(sessionId)) {
+                    activeUsers.set(sessionId, new Set());
+                }
+                activeUsers.get(sessionId).add(username);
                 socket.join(sessionId);
-                socket.emit("sessionMembers", { members: session.members });//sending the current members of the session to the user who just joined
+                socket.to(sessionId).emit("onlineMembers", [...activeUsers.get(sessionId)])
+                socket.to(sessionId).emit("sessionMembers", { members: updatedSession.members });//sending the current members of the session to the user who just joined
                 socket.emit("sessionJoined", { sessionId });// telling the user that they have joined the session
                 console.log("User joined session: ", sessionId);
                 console.log("Broadcasting userJoined to room:", sessionId);
