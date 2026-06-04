@@ -6,14 +6,10 @@ const sessionSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    members: [
-        {
-            userId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User"
-            }
-        }
-    ],
+    members: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }],
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

@@ -42,19 +42,20 @@ const initializeSocket = (server) => {
             try {
                 const session = await Session.findOne({ sessionId });
                 if (!session) {
-                    socket.emit("error", { message: "Room not found" });
+                    socket.emit("error", { message: "Session not found" });
+                    console.log("Session not found with id: ", sessionId);
                     return;
                 }
                 const alreadyMember = session.members.some(
-                    member => member.toString() === userId
+                    memberId => memberId.toString() === userId.toString()
                 );
-                
+
                 if (!alreadyMember) {
                     session.members.push(userId);
                     await session.save();
                 }
                 const updatedSession = await Session.findOne({ sessionId }).populate("members", "username");
-                const userJoined = updatedSession.members.find(member => member._id.toString() === userId);
+                const userJoined = updatedSession.members.find(member => member._id.toString() === userId.toString());
                 const username = userJoined.username;
                 socket.data = {
                     sessionId,
@@ -63,13 +64,14 @@ const initializeSocket = (server) => {
                 if (!activeUsers.has(sessionId)) {
                     activeUsers.set(sessionId, new Set());
                 }
-                activeUsers.get(sessionId).add(username);
+                activeUsers.get(sessionId).add(userId);
+                console.log("Active users in session ", sessionId, ": ", activeUsers.get(sessionId));
                 socket.join(sessionId);
-                socket.to(sessionId).emit("onlineMembers", [...activeUsers.get(sessionId)])
-                socket.to(sessionId).emit("sessionMembers", { members: updatedSession.members });//sending the current members of the session to the user who just joined
+                io.to(sessionId).emit("onlineMembers", [...activeUsers.get(sessionId)])
+                io.to(sessionId).emit("sessionMembers", { members: updatedSession.members });//sending the current members of the session to the user who just joined
                 socket.emit("sessionJoined", { sessionId });// telling the user that they have joined the session
-                console.log("User joined session: ", sessionId);
-                console.log("Broadcasting userJoined to room:", sessionId);
+                // console.log("User joined session: ", sessionId);
+                // console.log("Broadcasting userJoined to room:", sessionId);
                 socket.to(sessionId).emit("userJoined", { userId });// telling other users in the session that a new user has joined
             } catch (error) {
                 socket.emit("error", { message: error.message });
@@ -79,7 +81,7 @@ const initializeSocket = (server) => {
         //NOTE ADDED TO SESSION
         socket.on("note-updated", async ({ note, sessionId }) => {
             try {
-                console.log("backend has received the updated note: ", note);
+                // console.log("backend has received the updated note: ", note);
                 const session = await Session.findOne({ sessionId });
                 if (!session) {
                     socket.emit("error", { message: "Session not found" });
@@ -113,8 +115,6 @@ const initializeSocket = (server) => {
                 await handleLeave(socket, sessionId, userId);
             }
         })
-
-
         async function handleLeave(socket, sessionId, userId) {
             try {
                 await Session.findOneAndUpdate(

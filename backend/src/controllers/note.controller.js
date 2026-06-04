@@ -102,8 +102,8 @@ const getSessionNotes=async(req,res)=>{
             console.log("No session found with ID:", sessionId);
             return res.status(400).json({message:"No Session Found for this ID"});
         }
-        console.log("Session found:", session);
-        console.log("Got session:", session._id);
+        // console.log("Session found:", session);
+        // console.log("Got session:", session._id);
         const notes = await Note.find({sessionId:session._id}).sort({updatedAt:-1});
         if(!notes){
             console.log("No notes found for session:", sessionId);

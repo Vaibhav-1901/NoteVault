@@ -10,13 +10,14 @@ import CollabModal from '../components/CollabModal.jsx';
 import useCollaboration from '../hooks/useCollaboration.jsx';
 import { useRef } from 'react';
 import SessionMembers from '../components/SessionMembers.jsx';
+
 function Home() {
 
     const [sidebarVisible, setSidebarVisible] = useState(true);
     const { user, userloading } = useUser();
     const [activeTag, setActiveTag] = useState("all");
-    const { sessionId } = useCollab();
-
+    const { sessionId, allMembers, onlineMembers } = useCollab();
+    const activeUsers = allMembers.filter((m) => onlineMembers.includes(m._id.toString())).map((m) => m.username);
     // console.log("Session ID in Home:", sessionId);
     const [selectedId, setSelectedId] = useState(null);
     const { notes, error, addNote, deleteNote, editContent, toggleTag, changeTitle, saveNote, loading, setNotes } = useNote({
@@ -24,7 +25,7 @@ function Home() {
         sessionId
     });
     const isRemoteUpdate = useRef(false);
-    const { members } = useCollaboration(sessionId, user?._id, setNotes, isRemoteUpdate);
+    useCollaboration(sessionId, user?._id, setNotes, isRemoteUpdate);
     const [showTagPicker, setShowTagPicker] = useState(false);
     const [search, setSearch] = useState("");
     const selectedNote = notes?.find(note => note.id === selectedId);
@@ -404,8 +405,9 @@ function Home() {
                 {showCollabModal && (
                     <CollabModal onClose={() => setShowCollabModal(false)} />
                 )}
-                <SessionMembers />
-
+                <div className="fixed bottom-16 right-5 z-50">
+                    <SessionMembers />
+                </div>
             </div>
         </>
     )
