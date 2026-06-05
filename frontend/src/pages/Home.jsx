@@ -16,8 +16,7 @@ function Home() {
     const [sidebarVisible, setSidebarVisible] = useState(true);
     const { user, userloading } = useUser();
     const [activeTag, setActiveTag] = useState("all");
-    const { sessionId, allMembers, onlineMembers } = useCollab();
-    const activeUsers = allMembers.filter((m) => onlineMembers.includes(m._id.toString())).map((m) => m.username);
+    const { sessionId, allMembers, onlineMembers } = useCollab() 
     // console.log("Session ID in Home:", sessionId);
     const [selectedId, setSelectedId] = useState(null);
     const { notes, error, addNote, deleteNote, editContent, toggleTag, changeTitle, saveNote, loading, setNotes } = useNote({
@@ -26,6 +25,8 @@ function Home() {
     });
     const isRemoteUpdate = useRef(false);
     useCollaboration(sessionId, user?._id, setNotes, isRemoteUpdate);
+    
+    const activeUsers = allMembers.filter((m) => onlineMembers.includes(m._id.toString())).map((m) => m.username);
     const [showTagPicker, setShowTagPicker] = useState(false);
     const [search, setSearch] = useState("");
     const selectedNote = notes?.find(note => note.id === selectedId);

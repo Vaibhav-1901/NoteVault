@@ -2,9 +2,9 @@ import socket from "../socket/socket";
 import { useState } from "react";
 import { useUser } from "../context/UserContext.jsx";
 import React from "react";
-import {useCollab} from "../context/CollabContext.jsx";
+import { useCollab } from "../context/CollabContext.jsx";
 
- import {
+import {
     X, Users, Plus, LogIn,
     Copy, Check, ArrowLeft, Wifi
 } from "lucide-react";
@@ -16,7 +16,7 @@ function CollabModal({ onClose }) {
     const { sessionId, setSessionId } = useCollab();
     const [mode, setMode] = useState("");
     const [loading, setLoading] = useState(false);
-    const[inputSessionId,setInputSessionId]=useState("");
+    const [inputSessionId, setInputSessionId] = useState("");
     const [copied, setCopied] = useState(false);
 
     const handleCreate = () => {
@@ -38,8 +38,9 @@ function CollabModal({ onClose }) {
         if (!inputSessionId) return;
         setLoading(true);
         socket.connect(); // as had autoConnect false, need to connect before emitting
-
+        
         socket.emit("joinSession", { sessionId: inputSessionId, userId: user._id });
+
         socket.once("sessionJoined", ({ sessionId }) => {
             setMode("joined");
             setSessionId(sessionId);
@@ -52,13 +53,13 @@ function CollabModal({ onClose }) {
         });
 
     }
-    const handleCopy=async()=>{
+    const handleCopy = async () => {
         await navigator.clipboard.writeText(sessionId);
         setCopied(true);
     }
 
     return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/70 backdrop-blur-sm"

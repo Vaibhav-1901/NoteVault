@@ -67,8 +67,10 @@ const initializeSocket = (server) => {
                 activeUsers.get(sessionId).add(userId);
                 console.log("Active users in session ", sessionId, ": ", activeUsers.get(sessionId));
                 socket.join(sessionId);
+                console.log("EMITTING SESSIOn")
                 io.to(sessionId).emit("onlineMembers", [...activeUsers.get(sessionId)])
                 io.to(sessionId).emit("sessionMembers", { members: updatedSession.members });//sending the current members of the session to the user who just joined
+                console.log("EMITTED SESSIOn")
                 socket.emit("sessionJoined", { sessionId });// telling the user that they have joined the session
                 // console.log("User joined session: ", sessionId);
                 // console.log("Broadcasting userJoined to room:", sessionId);

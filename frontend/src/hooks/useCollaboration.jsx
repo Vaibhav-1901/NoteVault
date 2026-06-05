@@ -6,14 +6,31 @@ import { useCollab } from '../context/CollabContext.jsx';
 const useCollaboration = (sessionId, userId, setNotes, isRemoteUpdate) => {
     //have userId
     // const isBroadcasting = useRef(false); // prevent  loop // rather use id matching to prevent loop
-    // console.log("useCollaboration mounted");
+    console.log("useCollaboration mounted");
     // console.log("sessionId:", sessionId);
     // console.log("userId:", userId);
     const { allMembers, setAllMembers, onlineMembers, setOnlineMembers } = useCollab();
-
     useEffect(() => {
+        socket.on("sessionMembers", ({ members }) => {
+            // console.log("Current session members: ", members);
+            setAllMembers(members);
+        });
+
+        socket.on("onlineMembers", (members) => {
+            // console.log("Current online members: ", members);
+            setOnlineMembers(members);
+        });
+
+        return () => {
+            socket.off("sessionMembers");
+            socket.off("onlineMembers");
+        }
+    }, [])
+    useEffect(() => {
+        console.log("REGISTERING LISTENERS");
         if (!sessionId || !userId) return;
-     //marking UI as connected to the session
+        //marking UI as connected to the session
+        console.log("socket connected?", socket.connected);
         socket.on("userJoined", ({ userId }) => {
             console.log("SOMEONE NEW JOINED")
             // setAllMembers((prevMembers) => [...new Set([...prevMembers, userId])]);
@@ -28,19 +45,12 @@ const useCollaboration = (sessionId, userId, setNotes, isRemoteUpdate) => {
             isRemoteUpdate.current = true;
             setNotes((prevNotes) => prevNotes.map((n) => n.id === note.id ? note : n));
         })
-        socket.on("sessionMembers", ({ members }) => {
-            console.log("Current session members: ", members);
-            setAllMembers(members);
-        });
-        socket.on("onlineMembers", (members) => {
-            setOnlineMembers(members);
-        })
+
         return () => {
             socket.off("userJoined");
             socket.off("userLeft");
             socket.off("user-updated-note");
-            socket.off("sessionMembers");
-            socket.off("onlineMembers");
+
         };
 
     }, [sessionId, userId]);
