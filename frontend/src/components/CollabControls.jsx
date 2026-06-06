@@ -1,12 +1,20 @@
 import React from 'react'
 import { Users, LogIn, LogOut, Wifi } from "lucide-react";
 import { useCollab } from '../context/CollabContext.jsx';
+import { useUser } from '../context/UserContext.jsx';
+import socket from '../socket/socket.js';
 
-
-function CollabControls({openModal}) {
-    const { sessionId, allMembers, onlineMembers } = useCollab();
-    const handLeaveSession=()=>{
-        
+function CollabControls({ openModal }) {
+    const { sessionId, allMembers, onlineMembers, setSessionId, setAllMembers, setOnlineMembers } = useCollab();
+    const { user } = useUser();
+    const handleLeaveSession = () => {
+        socket.emit("leaveSession", { sessionId, userId: user._id });
+        socket.once("sessionLeft", () => {
+            setSessionId(null);
+            setAllMembers([]);
+            setOnlineMembers([]);
+            socket.disconnect();
+        })
     }
     return (
         <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2">

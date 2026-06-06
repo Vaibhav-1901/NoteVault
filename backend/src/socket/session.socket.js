@@ -119,12 +119,16 @@ const initializeSocket = (server) => {
         })
         async function handleLeave(socket, sessionId, userId) {
             try {
-                await Session.findOneAndUpdate(
-                    { sessionId },
-                    { $pull: { members: userId } }
-                );
+                // await Session.findOneAndUpdate(
+                //     { sessionId },
+                //     { $pull: { members: userId } }
+                // );
                 socket.leave(sessionId);
+                if(activeUsers.has(sessionId)){
+                    activeUsers.get(sessionId).delete(userId);
+                }
                 socket.to(sessionId).emit("userLeft", { userId });
+                socket.emit("sessionLeft");    
                 
             } catch (error) {
                 socket.emit("error", { message: error.message });

@@ -37,7 +37,8 @@ const useCollaboration = (sessionId, userId, setNotes, isRemoteUpdate) => {
         })
         socket.on("userLeft", ({ userId }) => {
             console.log("SOMEONE LEFT")
-            setAllMembers((prevMembers) => prevMembers.filter((id) => id !== userId));
+            setOnlineMembers((prevMembers)=>prevMembers.filter(((id)=> id.toString() !==userId.toString())));
+            
         })
         socket.on("user-updated-note", ({ note, updatedBy }) => {
             console.log("REMOTE UPDATE");
