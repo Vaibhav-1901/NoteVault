@@ -35,12 +35,14 @@ const createNote= async(req,res)=>{
 const getAllNotes= async(req,res)=>{
     try{
         const {userId}=req.params;
-        const notes= await Note.find({userId}).sort({createdAt: -1});
+        let notes= await Note.find({userId}).sort({createdAt: -1});
         if(!notes){
             return res.status(400).json({message:"No Notes Found"});
         }
+        notes=notes.filter(note => note.sessionId == null); 
         return res.status(200).json({notes});
     } catch(error){
+        console.log(error.message);
         return res.status(400).json({error:error.message});
     }
 }
@@ -53,6 +55,7 @@ const getSingleNote= async(req,res)=>{
         }
         return res.status(200).json({note});
     } catch(error){
+        console.log(error.message);
         return res.status(400).json({error:error.message});
     }
 }

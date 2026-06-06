@@ -16,7 +16,7 @@ function Home() {
     const [sidebarVisible, setSidebarVisible] = useState(true);
     const { user, userloading } = useUser();
     const [activeTag, setActiveTag] = useState("all");
-    const { sessionId, allMembers, onlineMembers } = useCollab() 
+    const { sessionId, allMembers, onlineMembers } = useCollab()
     // console.log("Session ID in Home:", sessionId);
     const [selectedId, setSelectedId] = useState(null);
     const { notes, error, addNote, deleteNote, editContent, toggleTag, changeTitle, saveNote, loading, setNotes } = useNote({
@@ -25,7 +25,7 @@ function Home() {
     });
     const isRemoteUpdate = useRef(false);
     useCollaboration(sessionId, user?._id, setNotes, isRemoteUpdate);
-    
+
     const activeUsers = allMembers.filter((m) => onlineMembers.includes(m._id.toString())).map((m) => m.username);
     const [showTagPicker, setShowTagPicker] = useState(false);
     const [search, setSearch] = useState("");
@@ -36,6 +36,7 @@ function Home() {
         return matchTag && matchSearch;
     })
     const [showCollabModal, setShowCollabModal] = useState(false);
+    const [showSessionMembers, setShowSessionMembers] = useState(false);
 
     // console.log(filtered)
     const ALL_TAGS = ["all", "work", "personal", "ideas", "archive"];
@@ -406,10 +407,12 @@ function Home() {
                 {showCollabModal && (
                     <CollabModal onClose={() => setShowCollabModal(false)} />
                 )}
-                <div className="fixed bottom-16 right-5 z-50">
-                    <SessionMembers />
-                </div>
-                <CollabControls openModal={() => setShowCollabModal(true)} />
+                {sessionId && (
+                    <div className="fixed bottom-19 right-5 z-50">
+                        <SessionMembers />
+                    </div>
+                )}
+                <CollabControls openModal={() => setShowCollabModal(true)} isOpen={showSessionMembers} toggleSessionMembers={() => setShowSessionMembers((prev) => !prev)} />
             </div>
         </>
     )
