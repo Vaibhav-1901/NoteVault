@@ -22,7 +22,7 @@ function CollabModal({ onClose }) {
     const handleCreate = () => {
         socket.connect();
         setLoading(true);
-        socket.emit("createSession", { userId: user._id });
+        socket.emit("createSession", { userId: user._id ,username: user.username});
         socket.once("sessionCreated", ({ sessionId }) => {//uisng once because we only want to listen for this event once, not every time a session is created
             setSessionId(sessionId);
             setMode("created");
@@ -39,7 +39,7 @@ function CollabModal({ onClose }) {
         setLoading(true);
         socket.connect(); // as had autoConnect false, need to connect before emitting
         
-        socket.emit("joinSession", { sessionId: inputSessionId, userId: user._id });
+        socket.emit("joinSession", { sessionId: inputSessionId, userId: user._id, username: user.username });
 
         socket.once("sessionJoined", ({ sessionId }) => {
             setMode("joined");

@@ -11,12 +11,15 @@ import useCollaboration from '../hooks/useCollaboration.jsx';
 import { useRef } from 'react';
 import SessionMembers from '../components/SessionMembers.jsx';
 import CollabControls from '../components/CollabControls.jsx';
+import useToast from '../hooks/useToast.js';
+import ToastContainer from '../components/ToastContainer.jsx';
+
 function Home() {
 
     const [sidebarVisible, setSidebarVisible] = useState(true);
     const { user, userloading } = useUser();
     const [activeTag, setActiveTag] = useState("all");
-    const { sessionId, allMembers, onlineMembers } = useCollab()
+    const { sessionId, allMembers, onlineMembers, toasts } = useCollab()
     // console.log("Session ID in Home:", sessionId);
     const [selectedId, setSelectedId] = useState(null);
     const { notes, error, addNote, deleteNote, editContent, toggleTag, changeTitle, saveNote, loading, setNotes } = useNote({
@@ -48,9 +51,9 @@ function Home() {
         books: { bg: "#3b2a1a", text: "#fb923c", dot: "#f97316" },
         archive: { bg: "#1a1a1a", text: "#FFFFFF", dot: "#555" },
     };
+    const {  show } = useToast();
     const navigate = useNavigate();
-
-    console.log(notes);
+    console.log("TOASTSSS:", toasts);
 
     if (error) {
         return (
@@ -413,6 +416,7 @@ function Home() {
                     </div>
                 )}
                 <CollabControls openModal={() => setShowCollabModal(true)} isOpen={showSessionMembers} toggleSessionMembers={() => setShowSessionMembers((prev) => !prev)} />
+                <ToastContainer toasts={toasts} />
             </div>
         </>
     )

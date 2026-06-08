@@ -16,9 +16,9 @@ const initializeSocket = (server) => {
     io.on("connection", (socket) => {
         console.log("New client connected: ", socket.id);
         //create session
-        socket.on("createSession", async ({ userId }) => {
+        socket.on("createSession", async ({ userId ,username}) => {
             try {
-                const sessionId = nanoid(8);
+                const sessionId = nanoid(8);       
                 const newsession = await Session.create({
                     sessionId,
                     members: [userId],
@@ -28,6 +28,7 @@ const initializeSocket = (server) => {
                 socket.data = {
                     sessionId: newsession.sessionId,
                     userId,
+                    username
                 }
                 socket.emit("sessionCreated", { sessionId });
                 console.log("session created with id: ", sessionId);
@@ -38,7 +39,7 @@ const initializeSocket = (server) => {
         });
 
         //join session
-        socket.on("joinSession", async ({ sessionId, userId }) => {
+        socket.on("joinSession", async ({ sessionId, userId, username }) => {
             try {
                 const session = await Session.findOne({ sessionId });
                 if (!session) {
@@ -60,6 +61,7 @@ const initializeSocket = (server) => {
                 socket.data = {
                     sessionId,
                     userId,
+                    username
                 }
                 if (!activeUsers.has(sessionId)) {
                     activeUsers.set(sessionId, new Set());
@@ -74,7 +76,7 @@ const initializeSocket = (server) => {
                 socket.emit("sessionJoined", { sessionId });// telling the user that they have joined the session
                 // console.log("User joined session: ", sessionId);
                 // console.log("Broadcasting userJoined to room:", sessionId);
-                socket.to(sessionId).emit("userJoined", { userId });// telling other users in the session that a new user has joined
+                socket.to(sessionId).emit("userJoined", { userId, username });// telling other users in the session that a new user has joined
             } catch (error) {
                 socket.emit("error", { message: error.message });
                 console.error("Error joining session:", error);
@@ -106,10 +108,10 @@ const initializeSocket = (server) => {
             }
         })
         socket.on("note-added", ({note,sessionId})=>{
-            socket.to(sessionId).emit("user-added-note", {note}); 
+            socket.to(sessionId).emit("user-added-note", {note,username: socket.data.username}); 
         })
         socket.on("note-deleted", ({id, sessionId})=>{
-            socket.to(sessionId).emit("user-deleted-note", {id});
+            socket.to(sessionId).emit("user-deleted-note", {id,username: socket.data.username});
         })
         //leave session 
         socket.on("leaveSession", async ({ sessionId, userId }) => {
@@ -119,22 +121,20 @@ const initializeSocket = (server) => {
         //disconnect unexpectedly
         socket.on("disconnect", async () => {
             const { sessionId, userId } = socket.data;
-            if (sessionId && userId) {
+            if (sessionId && userId) { //very imp if to prevent infinite loop
                 await handleLeave(socket, sessionId, userId);
             }
         })
         async function handleLeave(socket, sessionId, userId) {
             try {
-                // await Session.findOneAndUpdate(
-                //     { sessionId },
-                //     { $pull: { members: userId } }
-                // );
+                
                 socket.leave(sessionId);
                 if(activeUsers.has(sessionId)){
                     activeUsers.get(sessionId).delete(userId);
                 }
-                socket.to(sessionId).emit("userLeft", { userId });
-                socket.emit("sessionLeft");    
+                socket.to(sessionId).emit("userLeft", { userId, username:socket.data.username });
+                socket.emit("sessionLeft");
+                socket.data={};    
                 
             } catch (error) {
                 socket.emit("error", { message: error.message });
