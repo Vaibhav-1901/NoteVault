@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { Session } from '../models/session.model.js';
 import { Note } from '../models/note.model.js';
 
-const activeUsers = new Map();
+const activeUsers = new Map(); //whgere does this exist in theserver 
 
 const initializeSocket = (server) => {
     const io = new Server(server, {

@@ -55,13 +55,6 @@ function Home() {
     const navigate = useNavigate();
     console.log("TOASTSSS:", toasts);
 
-    if (error) {
-        return (
-            <div className='bg-black text-red-700'>
-                ⚠️ Error loading notes:{error}
-            </div>
-        )
-    }
     // console.log(selectedNote)
     // console.log(search)
 
@@ -140,6 +133,13 @@ function Home() {
         } catch (error) {
             console.error("Logout error:", error);
         }
+    }
+      if (error) {
+        return (
+            <div className='bg-black text-red-700'>
+                ⚠️ Error loading notes:{error}
+            </div>
+        )
     }
   
 

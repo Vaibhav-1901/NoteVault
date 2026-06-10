@@ -50,7 +50,19 @@ const registerUser = async function (req, res) {
             password,
             email
         })
-        return res.status(200).json({ user, message: "User registered" });
+        const { AccessToken, RefreshToken } = await generateAccessAndRefreshToken(user._id);
+        const options = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            path: "/",
+        }
+        return res
+        .status(200)
+        .cookie("AccessToken", AccessToken, options)
+        .cookie("RefreshToken", RefreshToken, options)
+        .json({ user, message: "User registered" });
+        
     } catch (error) {
         console.log("Error in registering user", error.message)
         res.status(400).json({ message: error.message });
@@ -66,7 +78,7 @@ const loginUser = async function (req, res) {
     //give access token
 
     try {
-        const { username ,email, password } = req.body;
+        const { username, email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
