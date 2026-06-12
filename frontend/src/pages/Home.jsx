@@ -357,7 +357,7 @@ function Home() {
                     </div>
                     {/* Note content */}
                     {selectedNote && (
-                        <div className='px-10 pt-4 flex flex-col h-full overflow-hidden'>
+                        <div className='px-10 pt-4 flex flex-col h-full pb-20 overflow-hidden'>
                             {/* //Title */}
                             <input type="text"
                                 value={selectedNote?.title || ''}
