@@ -20,17 +20,18 @@ function CollabModal({ onClose }) {
     const [inputSessionId, setInputSessionId] = useState("");
     const [copied, setCopied] = useState(false);
     const [error, setError] = useState("");
-    const {show}=useToast();
+    const { show } = useToast();
 
-    const handleChange=(e)=>{
+    const handleChange = (e) => {
         setInputSessionId(e.target.value);
         setError("");
     }
     const handleCreate = () => {
         setError("");
+        socket.auth = { token: user.AccessToken };
         socket.connect();
         setLoading(true);
-        socket.emit("createSession", { userId: user._id, username: user.username });
+        socket.emit("createSession");
         socket.once("sessionCreated", ({ sessionId }) => {//uisng once because we only want to listen for this event once, not every time a session is created
             setInputSessionId(sessionId);
             setMode("created");
@@ -42,15 +43,21 @@ function CollabModal({ onClose }) {
             setError(message);
             console.log("Error creating session:", message);
         });
+        socket.on("connect_error", (err) => {
+            console.log(err.message); // 
+            setLoading(false);
+            setError(err.message);
+        });
     }
 
     const handleJoin = () => {
         setError("");
         if (!inputSessionId) return;
         setLoading(true);
+        socket.auth = { token: user.AccessToken };
         socket.connect(); // as had autoConnect false, need to connect before emitting
 
-        socket.emit("joinSession", { sessionId: inputSessionId, userId: user._id, username: user.username });
+        socket.emit("joinSession", { sessionId });
 
         socket.once("sessionJoined", ({ sessionId }) => {
             setMode("joined");
@@ -63,6 +70,11 @@ function CollabModal({ onClose }) {
             setLoading(false);
             setError(message);
             console.log("Error joining session:", message);
+        });
+        socket.on("connect_error", (err) => {
+            console.log(err.message); // 
+            setLoading(false);
+            setError(err.message);
         });
 
     }

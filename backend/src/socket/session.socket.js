@@ -2,6 +2,8 @@ import { Server } from 'socket.io';
 import { nanoid } from 'nanoid';
 import { Session } from '../models/session.model.js';
 import { Note } from '../models/note.model.js';
+import jwt from 'jsonwebtoken';
+import {User} from '../models/user.model.js';
 
 const activeUsers = new Map(); //whgere does this exist in theserver 
 
@@ -12,12 +14,32 @@ const initializeSocket = (server) => {
             credentials: true
         }
     })
-
+    // socket auth middleware
+    io.use(async (socket,next)=>{
+        const token = socket.handshake.auth.token;
+        if(!token){
+            return next(new Error("Unauthorized"));
+        }
+        try {
+            const decoded=jwt.verify(token,ACCESS_TOKEN_SECRET);
+            const user= await User.findById(decoded.userId);
+            if(!user){
+                return next(new Error("User not found"));
+            }
+            socket.data.user=user;
+            next();
+        } catch (error) {
+            next(new Error("Unauthorized"));
+        }
+    })
     io.on("connection", (socket) => {
         console.log("New client connected: ", socket.id);
         //create session
-        socket.on("createSession", async ({ userId ,username}) => {
+        socket.on("createSession", async () => {
             try {
+                const userId = socket.data.user._id;
+                const username = socket.data.user.username;
+                //create a new session in the database
                 const sessionId = nanoid(8);       
                 const newsession = await Session.create({
                     sessionId,
@@ -33,8 +55,10 @@ const initializeSocket = (server) => {
         });
 
         //join session
-        socket.on("joinSession", async ({ sessionId, userId, username }) => {
+        socket.on("joinSession", async ({ sessionId }) => {
             try {
+                const userId = socket.data.user.id;
+                const username = socket.data.user.username;
                 const session = await Session.findOne({ sessionId });
                 if (!session) {
                     socket.emit("error", { message: "Session not found" });
@@ -50,8 +74,8 @@ const initializeSocket = (server) => {
                     await session.save();
                 }
                 const updatedSession = await Session.findOne({ sessionId }).populate("members", "username");
-                const userJoined = updatedSession.members.find(member => member._id.toString() === userId.toString());
-                const username = userJoined.username;
+                // const userJoined = updatedSession.members.find(member => member._id.toString() === userId.toString());
+                // const username = userJoined.username;
                 socket.data = {
                     sessionId,
                     userId,
@@ -108,7 +132,8 @@ const initializeSocket = (server) => {
             socket.to(sessionId).emit("user-deleted-note", {id,username: socket.data.username});
         })
         //leave session 
-        socket.on("leaveSession", async ({ sessionId, userId }) => {
+        socket.on("leaveSession", async ({ sessionId}) => {
+            const userId = socket.data.user.id;
             await handleLeave(socket, sessionId, userId);
         })
 
