@@ -5,9 +5,7 @@ export const fetchWithRefresh = async (url, options = {}) => {
         ...options,
         credentials: "include",
     });
-
     let data = await res.json();
-
     if (!res.ok && data.message === "Invalid Access Token") {
         const renew = await fetch(`${BASE_URL}/api/users/refresh`, {
             method: "POST",
@@ -16,10 +14,15 @@ export const fetchWithRefresh = async (url, options = {}) => {
 
         if (!renew.ok) {
             throw new Error("Session expired");
+            socket.disconnect();
         }
+        const data = await renew.json();
         if(socket.connected){
             socket.disconnect();
-            // sock.auth={token:}
+            socket.auth={
+                token:data.AccessToken
+            }
+            socket.connect();
         }
         console.log("Access token refreshed");
         res = await fetch(url, {
@@ -33,6 +36,5 @@ export const fetchWithRefresh = async (url, options = {}) => {
     if (!res.ok) {
         throw new Error(data.message || "Request failed");
     }
-
     return data;
 };

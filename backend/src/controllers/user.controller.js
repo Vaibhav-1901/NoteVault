@@ -191,7 +191,8 @@ const RefreshAccessToken = async (req, res) => {
             .cookie("AccessToken", AccessToken, options)
             .cookie("RefreshToken", RefreshToken, options)
             .json({
-                message: "Access Token Renewed"
+                message: "Access Token Renewed",
+                 AccessToken
             })
 
     } catch (error) {

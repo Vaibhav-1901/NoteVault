@@ -4,6 +4,7 @@ import { useUser } from "../context/UserContext.jsx";
 import React from "react";
 import { useCollab } from "../context/CollabContext.jsx";
 import useToast from "../hooks/useToast.js";
+import { BASE_URL } from "../../constants.js";
 
 import {
     X, Users, Plus, LogIn,
@@ -55,9 +56,9 @@ function CollabModal({ onClose }) {
         if (!inputSessionId) return;
         setLoading(true);
         socket.auth = { token: user.AccessToken };
-        socket.connect(); // as had autoConnect false, need to connect before emitting
-
-        socket.emit("joinSession", { sessionId });
+         socket.connect(); // as had autoConnect false, need to connect before emitting
+        console.log("Attempting to join session with ID:", inputSessionId);
+        socket.emit("joinSession", { sessionId: inputSessionId });
 
         socket.once("sessionJoined", ({ sessionId }) => {
             setMode("joined");
@@ -71,10 +72,34 @@ function CollabModal({ onClose }) {
             setError(message);
             console.log("Error joining session:", message);
         });
-        socket.on("connect_error", (err) => {
-            console.log(err.message); // 
-            setLoading(false);
-            setError(err.message);
+        socket.on("connect_error", async (err) => {
+            if (err.message !== "Unauthorized"){
+                console.log("Connection error:", err.message);
+                setError(err.message);
+                setLoading(false);
+                return;
+            }
+            try {
+                const renew = await fetch(`${BASE_URL}/api/users/refresh`, {
+                    method: "POST",
+                    credentials: "include"
+                });
+                if (!renew.ok) {
+                    throw new Error("Session expired");
+                    return;
+                }
+                const data = await renew.json();
+                socket.auth = {
+                    token: data.AccessToken,
+                };
+              
+                socket.connect();
+            } catch (error) {
+                console.log("Error refreshing access token:", error);
+                setLoading(false);
+                setError("Session expired. Please log in again.");
+            }
+
         });
 
     }

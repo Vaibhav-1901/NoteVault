@@ -16,19 +16,22 @@ const initializeSocket = (server) => {
     })
     // socket auth middleware
     io.use(async (socket,next)=>{
+         console.log("Received token:", socket.handshake.auth.token);
         const token = socket.handshake.auth.token;
         if(!token){
             return next(new Error("Unauthorized"));
         }
         try {
-            const decoded=jwt.verify(token,ACCESS_TOKEN_SECRET);
-            const user= await User.findById(decoded.userId);
+            const decoded=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
+            console.log("Decoded token:", decoded);
+            const user= await User.findById(decoded._id).select("-password");
             if(!user){
                 return next(new Error("User not found"));
             }
-            socket.data.user=user;
+            socket.data.user=user; 
             next();
         } catch (error) {
+            console.log(error);
             next(new Error("Unauthorized"));
         }
     })
