@@ -29,6 +29,7 @@ function CollabModal({ onClose }) {
     }
     const handleCreate = () => {
         setError("");
+        console.log("USERR PRINTIBNG",user);
         socket.auth = { token: user.AccessToken };
         socket.connect();
         setLoading(true);
@@ -44,36 +45,8 @@ function CollabModal({ onClose }) {
             setError(message);
             console.log("Error creating session:", message);
         });
-        socket.on("connect_error", (err) => {
-            console.log(err.message); // 
-            setLoading(false);
-            setError(err.message);
-        });
-    }
-
-    const handleJoin = () => {
-        setError("");
-        if (!inputSessionId) return;
-        setLoading(true);
-        socket.auth = { token: user.AccessToken };
-         socket.connect(); // as had autoConnect false, need to connect before emitting
-        console.log("Attempting to join session with ID:", inputSessionId);
-        socket.emit("joinSession", { sessionId: inputSessionId });
-
-        socket.once("sessionJoined", ({ sessionId }) => {
-            setMode("joined");
-            setSessionId(sessionId);
-            show(`Session joined successfully`, "sessionJoin");
-            setLoading(false);
-            onClose(); //what is onClose? its to close the modal and open collab page
-        })
-        socket.on("error", ({ message }) => {
-            setLoading(false);
-            setError(message);
-            console.log("Error joining session:", message);
-        });
         socket.on("connect_error", async (err) => {
-            if (err.message !== "Unauthorized"){
+            if (err.message !== "Unauthorized") {
                 console.log("Connection error:", err.message);
                 setError(err.message);
                 setLoading(false);
@@ -92,8 +65,65 @@ function CollabModal({ onClose }) {
                 socket.auth = {
                     token: data.AccessToken,
                 };
-              
-                socket.connect();
+                socket.off("connect_error");
+
+                socket.connect(); 
+                console.log("Access token refreshed, retrying connection...");
+            } catch (error) {
+                console.log("Error refreshing access token:", error);
+                setLoading(false);
+                setError("Session expired. Please log in again.");
+            }
+
+        });
+    }
+
+    const handleJoin = () => {
+        setError("");
+        if (!inputSessionId) return;
+        setLoading(true);
+         
+        socket.auth = { token: user.AccessToken };
+        socket.connect(); // as had autoConnect false, need to connect before emitting
+        console.log("Attempting to join session with ID:", inputSessionId);
+        socket.emit("joinSession", { sessionId: inputSessionId });
+
+        socket.once("sessionJoined", ({ sessionId }) => {
+            setMode("joined");
+            setSessionId(sessionId);
+            show(`Session joined successfully`, "sessionJoin");
+            setLoading(false);
+            onClose(); //what is onClose? its to close the modal and open collab page
+        })
+        socket.on("error", ({ message }) => {
+            setLoading(false);
+            setError(message);
+            console.log("Error joining session:", message);
+        });
+        socket.on("connect_error", async (err) => {
+            if (err.message !== "Unauthorized") {
+                console.log("Connection error:", err.message);
+                setError(err.message);
+                setLoading(false);
+                return;
+            }
+            try {
+                const renew = await fetch(`${BASE_URL}/api/users/refresh`, {
+                    method: "POST",
+                    credentials: "include"
+                });
+                if (!renew.ok) {
+                    throw new Error("Session expired");
+                    return;
+                }
+                const data = await renew.json();
+                socket.auth = {
+                    token: data.AccessToken,
+                };
+                socket.off("connect_error");
+
+                socket.connect(); 
+                console.log("Access token refreshed, retrying connection...");
             } catch (error) {
                 console.log("Error refreshing access token:", error);
                 setLoading(false);

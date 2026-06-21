@@ -23,12 +23,13 @@ const initializeSocket = (server) => {
         }
         try {
             const decoded=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
-            console.log("Decoded token:", decoded);
+            // console.log("Decoded token:", decoded);
             const user= await User.findById(decoded._id).select("-password");
             if(!user){
                 return next(new Error("User not found"));
             }
             socket.data.user=user; 
+            console.log("User authenticated:", user);
             next();
         } catch (error) {
             console.log(error);
@@ -40,7 +41,7 @@ const initializeSocket = (server) => {
         //create session
         socket.on("createSession", async () => {
             try {
-                const userId = socket.data.user._id;
+                const userId = socket.data.user._id.toString();
                 const username = socket.data.user.username;
                 //create a new session in the database
                 const sessionId = nanoid(8);       
@@ -60,7 +61,8 @@ const initializeSocket = (server) => {
         //join session
         socket.on("joinSession", async ({ sessionId }) => {
             try {
-                const userId = socket.data.user.id;
+                console.log(socket.data.user)
+                const userId = socket.data.user._id.toString();
                 const username = socket.data.user.username;
                 const session = await Session.findOne({ sessionId });
                 if (!session) {
@@ -79,21 +81,16 @@ const initializeSocket = (server) => {
                 const updatedSession = await Session.findOne({ sessionId }).populate("members", "username");
                 // const userJoined = updatedSession.members.find(member => member._id.toString() === userId.toString());
                 // const username = userJoined.username;
-                socket.data = {
-                    sessionId,
-                    userId,
-                    username
-                }
                 if (!activeUsers.has(sessionId)) {
                     activeUsers.set(sessionId, new Set());
                 }
                 activeUsers.get(sessionId).add(userId);
                 console.log("Active users in session ", sessionId, ": ", activeUsers.get(sessionId));
                 socket.join(sessionId);
-                console.log("EMITTING SESSIOn")
+                // console.log("EMITTING SESSIOn")
                 io.to(sessionId).emit("onlineMembers", [...activeUsers.get(sessionId)])
                 io.to(sessionId).emit("sessionMembers", { members: updatedSession.members });//sending the current members of the session to the user who just joined
-                console.log("EMITTED SESSIOn")
+                // console.log("EMITTED SESSIOn")
                 socket.emit("sessionJoined", { sessionId });// telling the user that they have joined the session
                 // console.log("User joined session: ", sessionId);
                 // console.log("Broadcasting userJoined to room:", sessionId);
@@ -122,7 +119,7 @@ const initializeSocket = (server) => {
                     { returnDocument: "after" }
                 )
                 //emit to everyone else in the session that a note has been added
-                socket.to(sessionId).emit("user-updated-note", { note: newNote, updatedBy: socket.data.userId });
+                socket.to(sessionId).emit("user-updated-note", { note: newNote, updatedBy: socket.data.user._id.toString() });
             } catch (error) {
                 socket.emit("error", { message: error.message });
                 console.log("Error updating note:", error);
@@ -136,7 +133,7 @@ const initializeSocket = (server) => {
         })
         //leave session 
         socket.on("leaveSession", async ({ sessionId}) => {
-            const userId = socket.data.user.id;
+            const userId = socket.data.user._id.toString() ;
             await handleLeave(socket, sessionId, userId);
         })
 

@@ -73,6 +73,7 @@ function Home() {
     }
     const handleAddNote = async () => {
         const res = await addNote();
+        console.log("Returned from addNote:", res);
         setSelectedId(res.id);
     }
     useEffect(() => {
