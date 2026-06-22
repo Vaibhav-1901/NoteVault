@@ -1,7 +1,7 @@
 import {io} from "socket.io-client";
-
+import { BASE_URL } from "../../constants.js";
 const socket=io(
-    "http://localhost:5000",
+    BASE_URL,
     {
         withCredentials:true,
         autoConnect:false, 

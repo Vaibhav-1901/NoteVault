@@ -6,18 +6,21 @@ import { userRouter } from "./src/routes/user.route.js";
 import { initializeSocket } from "./src/socket/session.socket.js";
 import http from "http";
 
-const app=express();
+const app = express();
 const server = http.createServer(app);//whenever request comes express handles 
 initializeSocket(server);
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173", 
-  credentials: true               
+  origin: "http://localhost:5173",
+  credentials: true
 }));
 app.use(cookieParser());
 //note routes
 app.use("/api/notes", noteRouter);
-app.use("/api/users", userRouter);
+app.use("/api/users", userRouter);it 
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+})
 
 
-export {app,server}   
+export { app, server }   
