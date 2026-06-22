@@ -45,6 +45,7 @@ const useCollaboration = (sessionId, userId, setNotes, isRemoteUpdate) => {
             console.log("REMOTE UPDATE");
             if (updatedBy === userId) return; 
             isRemoteUpdate.current = true;
+            console.log("IS NOTE UNDEFINED",note)
             setNotes((prevNotes) => prevNotes.map((n) => n.id === note.id ? note : n));
         })
         socket.on("user-added-note", ({note,username})=>{

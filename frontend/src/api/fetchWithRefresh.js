@@ -1,5 +1,4 @@
 import { BASE_URL } from '../../constants.js';
-import socket from "../socket/socket";
 export const fetchWithRefresh = async (url, options = {}) => {
     let res = await fetch(url, {
         ...options,
@@ -15,16 +14,9 @@ export const fetchWithRefresh = async (url, options = {}) => {
 
         if (!renew.ok) {
             throw new Error("Session expired");
-            socket.disconnect();
         }
         data = await renew.json();
-        if(socket.connected){
-            socket.disconnect();
-            socket.auth={
-                token:data.AccessToken
-            }
-            socket.connect();
-        }
+       
         console.log("Access token refreshed");
         res = await fetch(url, {
             ...options,

@@ -84,7 +84,9 @@ function useNote(options = {}) {
             console.log("Returned data:", data);
             console.log("Returned note:", data.note);
             setNotes((prev) => [data.note, ...prev]);
-            socket.emit("note-added", { note: data.note, sessionId }); //emitting the new note to the backend so that it can be broadcasted to other users in the session
+            if(isCollaborative && sessionId){
+                socket.emit("note-added", { note: data.note, sessionId }); //emitting the new note to the backend so that it can be broadcasted to other users in the session
+            }
             return data.note
         } catch (error) {
             console.log("Error:", error.message);

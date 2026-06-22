@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { Session } from '../models/session.model.js';
 import { Note } from '../models/note.model.js';
 import jwt from 'jsonwebtoken';
-import {User} from '../models/user.model.js';
+import { User } from '../models/user.model.js';
 
 const activeUsers = new Map(); //whgere does this exist in theserver 
 
@@ -15,20 +15,20 @@ const initializeSocket = (server) => {
         }
     })
     // socket auth middleware
-    io.use(async (socket,next)=>{
-         console.log("Received token:", socket.handshake.auth.token);
+    io.use(async (socket, next) => {
+        console.log("Received token:", socket.handshake.auth.token);
         const token = socket.handshake.auth.token;
-        if(!token){
+        if (!token) {
             return next(new Error("Unauthorized"));
         }
         try {
-            const decoded=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
+            const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
             // console.log("Decoded token:", decoded);
-            const user= await User.findById(decoded._id).select("-password");
-            if(!user){
+            const user = await User.findById(decoded._id).select("-password");
+            if (!user) {
                 return next(new Error("User not found"));
             }
-            socket.data.user=user; 
+            socket.data.user = user;
             console.log("User authenticated:", user);
             next();
         } catch (error) {
@@ -44,7 +44,7 @@ const initializeSocket = (server) => {
                 const userId = socket.data.user._id.toString();
                 const username = socket.data.user.username;
                 //create a new session in the database
-                const sessionId = nanoid(8);       
+                const sessionId = nanoid(8);
                 const newsession = await Session.create({
                     sessionId,
                     members: [userId],
@@ -61,7 +61,7 @@ const initializeSocket = (server) => {
         //join session
         socket.on("joinSession", async ({ sessionId }) => {
             try {
-                console.log(socket.data.user)
+                socket.data.sessionId = sessionId
                 const userId = socket.data.user._id.toString();
                 const username = socket.data.user.username;
                 const session = await Session.findOne({ sessionId });
@@ -125,36 +125,42 @@ const initializeSocket = (server) => {
                 console.log("Error updating note:", error);
             }
         })
-        socket.on("note-added", ({note,sessionId})=>{
-            socket.to(sessionId).emit("user-added-note", {note,username: socket.data.username}); 
+        socket.on("note-added", ({ note, sessionId }) => {
+            socket.to(sessionId).emit("user-added-note", { note, username: socket.data.user.username });
         })
-        socket.on("note-deleted", ({id, sessionId})=>{
-            socket.to(sessionId).emit("user-deleted-note", {id,username: socket.data.username});
+        socket.on("note-deleted", ({ id, sessionId }) => {
+            socket.to(sessionId).emit("user-deleted-note", { id, username: socket.data.user.username });
         })
         //leave session 
-        socket.on("leaveSession", async ({ sessionId}) => {
-            const userId = socket.data.user._id.toString() ;
+        socket.on("leaveSession", async ({ sessionId }) => {
+            const userId = socket.data.user._id.toString();
             await handleLeave(socket, sessionId, userId);
         })
 
         //disconnect unexpectedly
         socket.on("disconnect", async () => {
-            const { sessionId, userId } = socket.data;
+            const sessionId = socket.data.sessionId;
+            const user = socket.data.user;
+            if (!user) {
+                console.log("Disconnect before authentication completed.");
+                return;
+            }
+            const userId = user._id.toString();
             if (sessionId && userId) { //very imp if to prevent infinite loop
                 await handleLeave(socket, sessionId, userId);
             }
         })
         async function handleLeave(socket, sessionId, userId) {
             try {
-                
+
                 socket.leave(sessionId);
-                if(activeUsers.has(sessionId)){
+                if (activeUsers.has(sessionId)) {
                     activeUsers.get(sessionId).delete(userId);
                 }
-                socket.to(sessionId).emit("userLeft", { userId, username:socket.data.username });
+                socket.to(sessionId).emit("userLeft", { userId, username: socket.data.user.username });
                 socket.emit("sessionLeft");
-                socket.data={};    
-                
+                socket.data = {};
+
             } catch (error) {
                 socket.emit("error", { message: error.message });
                 console.error("Error leaving session:", error);
