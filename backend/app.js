@@ -11,8 +11,8 @@ const server = http.createServer(app);//whenever request comes express handles
 initializeSocket(server);
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
+  origin: ["http://localhost:5173",
+    "https://note-vault-eight-neon.vercel.app"]
 }));
 app.use(cookieParser());
 //note routes
