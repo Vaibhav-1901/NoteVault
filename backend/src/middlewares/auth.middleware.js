@@ -13,8 +13,9 @@ const verifyJWT = async (req, res, next) => {
             return res.status(400).json({ message: "User is not logged in" });//Also checking if user is logged in or not 
         }
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)//Decoded the TOKEN
-        const user = await User.findById(decodedToken?._id).select("-password-")
+        const user = await User.findById(decodedToken?._id).select("-password")
         if (!user) {
+            return res.status(401).json({ message: "Invalid Access Token" })
             console.log("Invalid Access Token")
         }
         req.user = user;

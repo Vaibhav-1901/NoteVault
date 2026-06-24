@@ -163,8 +163,9 @@ const RefreshAccessToken = async (req, res) => {
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         path: "/",
     }
-
-    const IncomingRefreshToken = req.cookies?.RefreshToken || req.body.RefreshToken
+    console.log("Cookies:", req.cookies);
+    console.log("Body:", req.body);
+    const IncomingRefreshToken = req.cookies?.RefreshToken || req.body?.RefreshToken
     if (!IncomingRefreshToken) {//Getting the token 
         return res.status(400).json({ message: "No Refresh Token" });
     }
