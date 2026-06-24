@@ -5,7 +5,6 @@ export const fetchWithRefresh = async (url, options = {}) => {
         credentials: "include",
     });
     let data = await res.json();
-    console.log("FIRST RESPONSE", res.status, data);
     if (!res.ok && data.message === "Invalid Access Token") {
         const renew = await fetch(`${BASE_URL}/api/users/refresh`, {
             method: "POST",
@@ -17,7 +16,6 @@ export const fetchWithRefresh = async (url, options = {}) => {
         }
         data = await renew.json();
        
-        console.log("Access token refreshed");
         res = await fetch(url, {
             ...options,
             credentials: "include",
@@ -25,7 +23,6 @@ export const fetchWithRefresh = async (url, options = {}) => {
 
         data = await res.json();
 
-         console.log("SECOND RESPONSE", res.status, data);
     }
 
     if (!res.ok) {

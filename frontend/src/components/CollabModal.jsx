@@ -29,7 +29,6 @@ function CollabModal({ onClose }) {
     }
     const handleCreate = () => {
         setError("");
-        console.log("USERR PRINTIBNG",user);
         socket.auth = { token: user.AccessToken };
         socket.connect();
         setLoading(true);
@@ -43,11 +42,9 @@ function CollabModal({ onClose }) {
         socket.on("error", ({ message }) => {
             setLoading(false);
             setError(message);
-            console.log("Error creating session:", message);
         });
         socket.on("connect_error", async (err) => {
             if (err.message !== "Unauthorized") {
-                console.log("Connection error:", err.message);
                 setError(err.message);
                 setLoading(false);
                 return;
@@ -68,9 +65,7 @@ function CollabModal({ onClose }) {
                 socket.off("connect_error");
 
                 socket.connect(); 
-                console.log("Access token refreshed, retrying connection...");
             } catch (error) {
-                console.log("Error refreshing access token:", error);
                 setLoading(false);
                 setError("Session expired. Please log in again.");
             }
@@ -84,8 +79,7 @@ function CollabModal({ onClose }) {
         setLoading(true);
          
         socket.auth = { token: user.AccessToken };
-        socket.connect(); // as had autoConnect false, need to connect before emitting
-        console.log("Attempting to join session with ID:", inputSessionId);
+        socket.connect(); 
         socket.emit("joinSession", { sessionId: inputSessionId });
 
         socket.once("sessionJoined", ({ sessionId }) => {
@@ -102,7 +96,6 @@ function CollabModal({ onClose }) {
         });
         socket.on("connect_error", async (err) => {
             if (err.message !== "Unauthorized") {
-                console.log("Connection error:", err.message);
                 setError(err.message);
                 setLoading(false);
                 return;
@@ -123,7 +116,6 @@ function CollabModal({ onClose }) {
                 socket.off("connect_error");
 
                 socket.connect(); 
-                console.log("Access token refreshed, retrying connection...");
             } catch (error) {
                 console.log("Error refreshing access token:", error);
                 setLoading(false);
@@ -140,19 +132,16 @@ function CollabModal({ onClose }) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-            {/* Backdrop */}
+            
             <div
                 className="absolute inset-0 bg-black/70 backdrop-blur-sm"
                 onClick={onClose}
             />
 
-            {/* Modal */}
             <div className="relative w-[440px] bg-[#111113] border border-white/8 rounded-2xl shadow-2xl overflow-hidden">
 
-                {/* Top glow accent */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2  w-48 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-                {/* Header */}
                 <div className="flex items-center justify-between px-6 pt-6 pb-5">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
@@ -175,20 +164,16 @@ function CollabModal({ onClose }) {
                     </button>
                 </div>
 
-                {/* Divider */}
                 <div className="h-px bg-white/5 mx-6" />
 
-                {/* Body */}
                 <div className="px-6 py-5">
 
-                    {/* ── Initial choice ── */}
                     {!mode && (
                         <div className="flex flex-col gap-2.5">
                             <p className="text-white/40 text-xs uppercase tracking-widest font-medium mb-1">
                                 Choose an option
                             </p>
 
-                            {/* Create */}
                             <button
                                 onClick={handleCreate}
                                 disabled={loading}
@@ -207,7 +192,6 @@ function CollabModal({ onClose }) {
                                 </div>
                             </button>
 
-                            {/* Join */}
                             <button
                                 onClick={() => setMode("join")}
                                 className="group flex items-center gap-4 w-full bg-white/4 hover:bg-white/7 border border-white/8 hover:border-white/15 rounded-xl px-4 py-4 transition-all text-left"
@@ -227,7 +211,6 @@ function CollabModal({ onClose }) {
                         </div>
                     )}
 
-                    {/* ── Session Created ── */}
                     {mode === "created" && (
                         <div className="flex flex-col gap-4">
                             <div className="flex items-center gap-2">
@@ -267,7 +250,6 @@ function CollabModal({ onClose }) {
                         </div>
                     )}
 
-                    {/* ── Join flow ── */}
                     {mode === "join" && (
                         <div className="flex flex-col gap-3">
                             <p className="text-white/40 text-xs">
@@ -309,7 +291,6 @@ function CollabModal({ onClose }) {
                     )}
                 </div>
 
-                {/* Footer */}
                 <div className="px-6 pb-5 pt-1">
                     <p className="text-white/15 text-xs text-center">
                         Changes sync in real-time across all members

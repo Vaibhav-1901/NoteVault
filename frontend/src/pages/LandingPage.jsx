@@ -11,7 +11,6 @@ function LandingPage() {
     return (
         <div className="min-h-screen bg-[#080809] text-white font-mono overflow-x-hidden">
 
-            {/* ── Navbar ── */}
             <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 h-14 border-b border-white/4 bg-[#080809]/80 backdrop-blur-md">
                 <span className="text-white/25 text-lg font-bold tracking-tight"> <span className="text-white">Co</span> Write</span>
                 <div className="flex items-center gap-3">
@@ -26,12 +25,10 @@ function LandingPage() {
 
             <section className=" relative flex flex-col items-center justify-center min-h-screen px-6 pt-14 overflow-hidden">
 
-                {/* Background glow */}
                 <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] opacity-[0.07]"
                     style={{ background: 'radial-gradient(ellipse, rgba(52,211,153,1) 0%, transparent 70%)' }}
                 />
 
-                {/* Dot grid */}
                 <div className="absolute inset-0 opacity-[0.035]"
                     style={{
                         backgroundImage: `radial-gradient(circle, #ffffff 1px, transparent 1px)`,
@@ -52,7 +49,6 @@ function LandingPage() {
                     <span className="text-[11px] text-white/35 tracking-wider">aB3kR9mX · 3 online</span>
                 </div>
 
-                {/* Hero text */}
                 <div className="relative z-10 flex flex-col items-center text-center gap-5 max-w-2xl">
                     <div className="text-[10px] uppercase tracking-[0.25em] text-white/20 border border-white/8 px-3 py-1.5 rounded-full">
                         real-time collaborative notes
@@ -91,7 +87,6 @@ function LandingPage() {
                             alt="notes app"
                             className="w-full object-cover object-top"
                         />
-                        {/* Fade bottom of screenshot */}
                         <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#080809] to-transparent" />
                     </div>
                 </div>
@@ -103,7 +98,6 @@ function LandingPage() {
                     </div>
 
                     <div className="border border-white/6 rounded-2xl bg-[#0c0c0d] overflow-hidden">
-                        {/* Steps */}
                         <div className="divide-y flex  flex-col gap-10 divide-white/5">
                             {[
                                 {
@@ -129,18 +123,15 @@ function LandingPage() {
                                 }
                             ].map((item) => (
                                 <div key={item.step} className="grid grid-cols-1   md:grid-cols-[80px_1fr_1fr]  gap-8 px-8 py-7 group hover:bg-white/[0.02] transition-colors duration-200">
-                                    {/* Step number */}
                                     <span className="text-[42px] font-bold text-white/5 leading-none select-none group-hover:text-white/8 transition-colors">
                                         {item.step}
                                     </span>
 
-                                    {/* Command block */}
                                     <div className="flex flex-col justify-center gap-2">
                                         <span className="text-emerald-400/60 text-sm">{item.cmd}</span>
                                         <span className="text-white/15 text-xs">{item.output}</span>
                                     </div>
 
-                                    {/* Description */}
                                     <div className="flex flex-col justify-center gap-1.5">
                                         <h3 className="text-sm font-semibold tracking-tight text-white">{item.title}</h3>
                                         <p className="text-white/30 text-sm leading-relaxed">{item.desc}</p>
@@ -152,7 +143,6 @@ function LandingPage() {
                 </div>
             </section>
 
-            {/* ── Features ── */}
             <section id="features" className=" py-10 flex flex-col px-4 md:px-20 ">
                 <div className="max-w-7xl mx-auto">
                     <div className=" ml-[22px] text-xl uppercase tracking-[0.25em] text-white/20 mb-6">
@@ -223,7 +213,6 @@ function LandingPage() {
                 </div>
             </section   >
 
-            {/* ── Auth CTA ── */}
             <section className="py-14 px-6 flex flex-col items-center text-center gap-6 border-t border-white/4">
                 <h2 className="text-2xl font-bold tracking-tight">ready to stop copy-pasting?</h2>
                 <p className="text-white/30 text-sm max-w-xs">
@@ -237,7 +226,6 @@ function LandingPage() {
                 </button>
             </section>
 
-            {/* ── Auth Modal ── */}
             {showAuth && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div

@@ -7,12 +7,12 @@ import { initializeSocket } from "./src/socket/session.socket.js";
 import http from "http";
 
 const app = express();
-const server = http.createServer(app);//whenever request comes express handles 
+const server = http.createServer(app);//whenever http request comes express handles 
 initializeSocket(server);
 app.use(express.json());
 app.use(cors({
   origin: ["http://localhost:5173",
-    "https://note-vault-eight-neon.vercel.app"],
+    "https://usecowrite.vercel.app",],
     credentials: true
 }));
 app.use(cookieParser());

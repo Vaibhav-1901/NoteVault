@@ -10,11 +10,11 @@ const createNote= async(req,res)=>{
         let session;
         if(sessionId){
             session = await Session.findOne({sessionId});
-            console.log(session)
+    
             if(!session){
-                console.log("No session found with ID:", sessionId);
+                
                 return res.status(400).json({message:"No Session Found for this ID"});
-                console.log("No session found with ID:", sessionId);
+                
             }
         }
         
@@ -27,7 +27,7 @@ const createNote= async(req,res)=>{
         return res.status(200).json({note})
 
     } catch(error){
-        console.log(error.message)
+     
         return res.status(400).json({error:error.message});
     }
 }
@@ -42,7 +42,7 @@ const getAllNotes= async(req,res)=>{
         notes=notes.filter(note => note.sessionId == null); 
         return res.status(200).json({notes});
     } catch(error){
-        console.log(error.message);
+        
         return res.status(400).json({error:error.message});
     }
 }
@@ -55,7 +55,7 @@ const getSingleNote= async(req,res)=>{
         }
         return res.status(200).json({note});
     } catch(error){
-        console.log(error.message);
+        
         return res.status(400).json({error:error.message});
     }
 }
@@ -64,22 +64,20 @@ const editNote= async(req,res)=>{
     try{
         const {id}=req.params;  
         const {title,content,tags}=req.body;
-        // if(!title){
-        //     return res.status(400).json({message:"Title and Content cannot be empty"});
-        // }
+    
         const note= await Note.findByIdAndUpdate(id,{
             title,
             content,
             tags
         },{returnDocument: "after" })
         if(!note){
-            console.log("Error:", error.message);
+            
             return res.status(400).json({message:"No Note Found"});
         }
         return res.status(200).json({message:"Note Successfully Updated", note}); 
     }
     catch(error){
-        console.log(error.message);
+      
         return res.status(400).json({error:error.message}); 
     }
 }
@@ -102,19 +100,18 @@ const getSessionNotes=async(req,res)=>{
         const {sessionId}=req.params;
         const session = await Session.findOne({sessionId}).sort({updatedAt:-1});
         if(!session){
-            console.log("No session found with ID:", sessionId);
+    
             return res.status(400).json({message:"No Session Found for this ID"});
         }
-        // console.log("Session found:", session);
-        // console.log("Got session:", session._id);
+        
         const notes = await Note.find({sessionId:session._id}).sort({updatedAt:-1});
         if(!notes){
-            console.log("No notes found for session:", sessionId);
+          
             return res.status(400).json({message:"No Notes Found for this session"});
         }
         return res.status(200).json({notes});   
     } catch (error) {
-        console.log("Error fetching session notes:", error.message);
+        
         return res.status(400).json({error:error.message});
     }
 }

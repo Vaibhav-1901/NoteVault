@@ -22,7 +22,7 @@ function CollabControls({ openModal, isOpen, toggleSessionMembers, sidebarVisibl
         })
     }
     return (
-        <div className={`md:fixed ${sidebarVisible ? "hidden" : "fixed"} bottom-5 right-5 z-50 flex flex-col items-stretch w-[220px]`}>
+        <div className={` ${sidebarVisible ? "hidden md:flex" : "fixed"} md:fixed  bottom-5 right-5 z-50 flex flex-col items-stretch w-[220px]`}>
             {!sessionId ? (
                 <button
                     onClick={openModal}
@@ -36,9 +36,7 @@ function CollabControls({ openModal, isOpen, toggleSessionMembers, sidebarVisibl
                     <span className="text-xs font-medium tracking-wide">Collaborate</span>
                 </button>
             ) : (
-                // In session — session ID + leave, same width as members panel
                 <div className={`flex items-center bg-[#141414] border border-white/8 ${isOpen ? "rounded-b-xl" : "rounded-xl" }`}>
-                    {/* Session ID */}
                     <button
                         onClick={toggleSessionMembers}
                         className="flex items-center gap-2  px-[18px] h-10 border-r border-white/6
@@ -51,13 +49,13 @@ function CollabControls({ openModal, isOpen, toggleSessionMembers, sidebarVisibl
                         <span className="text-[11px] text-white/30 font-mono tracking-wider truncate flex-1 ml-1">
                            {onlineMembers.length} online
                         </span>
-                        {/* Arrow */}
+                     
                         {isOpen
                             ? <ChevronDown size={11} className="text-white/20 flex-shrink-0 animate-pulse" />
                             : <ChevronUp size={11} className="text-white/20 flex-shrink-0 animate-pulse" />
                         }
                     </button>
-                    {/* Leave */}
+                 
                     <button
                         onClick={handleLeaveSession}
                         className="flex items-center gap-1.5 h-10 px-[21px] 

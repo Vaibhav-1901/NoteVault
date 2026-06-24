@@ -24,7 +24,6 @@ function Home() {
     }
     const [activeTag, setActiveTag] = useState("all");
     const { sessionId, allMembers, onlineMembers, toasts } = useCollab()
-    // console.log("Session ID in Home:", sessionId);
     const [selectedId, setSelectedId] = useState(null);
     const { notes, error, addNote, deleteNote, editContent, toggleTag, changeTitle, saveNote, loading, setNotes } = useNote({
         isCollaborative: !!sessionId,
@@ -45,7 +44,6 @@ function Home() {
     const [showCollabModal, setShowCollabModal] = useState(false);
     const [showSessionMembers, setShowSessionMembers] = useState(false);
 
-    // console.log(filtered)
     const ALL_TAGS = ["all", "work", "personal", "ideas", "archive"];
 
     const TAG_COLORS = {
@@ -56,11 +54,6 @@ function Home() {
         archive: { bg: "#1a1a1a", text: "#FFFFFF", dot: "#555" },
     };
     const { show } = useToast();
-    console.log("TOASTSSS:", toasts);
-
-    // console.log(selectedNote)
-    // console.log(search)
-
     function timeAgo(date) {
         const d = new Date(date);
         const diff = Date.now() - d.getTime();
@@ -73,7 +66,6 @@ function Home() {
     }
     const handleAddNote = async () => {
         const res = await addNote();
-        console.log("Returned from addNote:", res);
         setSelectedId(res.id);
     }
     useEffect(() => {
@@ -98,7 +90,6 @@ function Home() {
     }, [notes]);
 
     useEffect(() => {
-        console.log("SAVE EFFECT");
         if (!selectedNote) return;
         if (isRemoteUpdate.current) {
             isRemoteUpdate.current = false;
@@ -159,7 +150,6 @@ function Home() {
                 )}
                 {sidebarVisible && (
                     <aside className=' fade-in fixed inset-y-0 left-0 z-40  w-65 md:static md:z-auto md:w-85 md:min-w-85 bg-[#131313] border-r border-[#1f1f1f] flex flex-col h-screen overflow-hidden'>
-                        {/* App header */}
                         <div className='flex items-center justify-between px-4 pt-4.5 pb-3'>
                             <div className='flex gap-2 items-center justify-center md:block md:gap-0'>
                                 <button className=" md:hidden text-[#444] p-1.5 rounded-md flex items-center justify-center hover:text-[#e0e0e0] hover:bg-[#1e1e1e] transition-colors cursor-pointer border-none bg-transparent"
@@ -183,7 +173,6 @@ function Home() {
                                 </svg>
                             </button>
                         </div>
-                        {/* Search */}
                         <div className="mx-3 mb-3 relative flex items-center">
                             <svg className="absolute left-2.5 text-[#444] pointer-events-none" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -196,7 +185,6 @@ function Home() {
                             />
 
                         </div>
-                        {/* Tags */}
                         <div className="px-3 pb-2">
                             <div className="text-[9px] tracking-[0.12em] text-[#3a3a3a] mb-1.5 px-1">TAGS</div>
                             <div className="flex flex-col gap-px">
@@ -222,7 +210,6 @@ function Home() {
                             </div>
                         </div>
                         <div className="h-px bg-[#1a1a1a] my-1" />
-                        {/* Notes list */}
                         <div className="flex-1 overflow-y-auto px-2 pb-4">
                             {filtered?.length === 0 && (
                                 <div className="text-center text-[#555] mt-10">
@@ -283,7 +270,6 @@ function Home() {
                             ))}
 
                         </div>
-                        {/* UserInfo */}
                         <div className="flex items-center justify-between p-5   border-t border-[#1f1f1f]">
                             {userloading ? (
                                 <h1 className="text-white/70">Loading...</h1>
@@ -300,12 +286,9 @@ function Home() {
                         </div>
                     </aside>
                 )}
-                {/* Main Full Note */}
                 <main className='flex-1 flex flex-col h-full w-full overflow-hidden relative  '>
-                    {/* UserHeader */}
 
 
-                    {/* Tools */}
 
                     <div className={` items-center md:px-10 px-4 py-3 border-b border-[#1a1a1a] gap-1 relative flex  ${sidebarVisible ? 'justify-end' : 'justify-between'} md:justify-between`}>
                         <button className={` ${sidebarVisible ? 'hidden' : 'md:flex'} text-[#444] p-1.5 rounded-md md:flex items-center justify-center hover:text-[#e0e0e0] hover:bg-[#1e1e1e] transition-colors cursor-pointer border-none bg-transparent `}
@@ -366,22 +349,16 @@ function Home() {
                             </button>
                         </div>
                     </div>
-                    {/* Note content */}
+                    
                     {selectedNote && (
                         <div className='px-10 pt-4 flex flex-col h-full pb-20 overflow-hidden'>
-                            {/* //Title */}
                             <input type="text"
                                 value={selectedNote?.title || ''}
                                 onChange={(e) => changeTitle(e.target.value, selectedId)}
                                 placeholder='Untitled Note'
                                 className='bg-transparent border-none text-[#f0f0f0] w-full mb-3 font-serif text-[30px]  focus:outline-none leading-tight tracking-normal break-words w-full max-w-[600px] min-w-0'
                             />
-                            {/* <div>
-                                <span className='text-[11px] text-[#fff] cursor-pointer letter tracking-[0.02em] transition-colors hover:text-[#d6d6d6]'
-                                onClick={()=>setShowTagPicker(prev=>!prev)}>
-                                    + add tag
-                                </span>
-                            </div> */}
+                         
 
                             {selectedNote?.tags?.length > 0 && (
                                 <div className='flex  gap-2'>
@@ -400,7 +377,6 @@ function Home() {
 
 
                             <div className="h-px bg-[#1a1a1a] mb-5 w-full" />
-                            {/* Content */}
                             <textarea name="content" id=""
                                 value={selectedNote?.content}
                                 onChange={(e) => editContent(e, selectedId)}
@@ -418,11 +394,6 @@ function Home() {
                 {showTagPicker && (
                     <div className="fixed inset-0 z-40" onClick={() => setShowTagPicker(false)} />
                 )}
-                {/* <button
-                    className="fixed bottom-5 right-5 bg-[#1e1e1e] border border-[#2a2a2a] text-[#aaa] rounded-md w-20 h-10 flex items-center justify-center hover:bg-[#2a2a2a] transition-colors cursor-pointer z-50 "
-                    onClick={() => setShowCollabModal(true)}>
-                    Collab
-                </button> */}
                 {showCollabModal && (
                     <CollabModal onClose={() => setShowCollabModal(false)} />
                 )}

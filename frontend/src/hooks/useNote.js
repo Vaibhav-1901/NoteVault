@@ -11,10 +11,9 @@ function useNote(options = {}) {
     const { user, userLoading } = useUser();
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-    // console.log("Session ID in useNote: ", sessionId);
     const fetchNotes = async () => {
         try {
-            const data = await fetchWithRefresh(`${BASE_URL}/api/notes/user/${user._id}`);            // console.log(data.notes)
+            const data = await fetchWithRefresh(`${BASE_URL}/api/notes/user/${user._id}`);        
             setNotes(data.notes);
 
         } catch (err) {
@@ -31,9 +30,7 @@ function useNote(options = {}) {
     const fetchSessionNotes = async () => {
         try {
             setLoading(true);
-            console.log("Inside for session ID: ", sessionId);
             const data = await fetchWithRefresh(`${BASE_URL}/api/notes/session/${sessionId}`);
-            console.log("Session Notes:", data.notes);
             setNotes(data.notes);
         } catch (err) {
             if (err.message === "Session expired") {
@@ -63,7 +60,6 @@ function useNote(options = {}) {
             tags: [],
             updatedAt: new Date(),
         }
-        // setNotes((prev) => [newNote, ...prev]);
         try {
             const payload = {
                 title: newNote.title,
@@ -81,11 +77,9 @@ function useNote(options = {}) {
                 },
                 body: JSON.stringify(payload),
             });
-            console.log("Returned data:", data);
-            console.log("Returned note:", data.note);
             setNotes((prev) => [data.note, ...prev]);
             if(isCollaborative && sessionId){
-                socket.emit("note-added", { note: data.note, sessionId }); //emitting the new note to the backend so that it can be broadcasted to other users in the session
+                socket.emit("note-added", { note: data.note, sessionId }); 
             }
             return data.note
         } catch (error) {
@@ -94,7 +88,6 @@ function useNote(options = {}) {
         }
     }
     useEffect(() => {
-        console.log("useEffect in useNote called with sessionId: ", sessionId, " and isCollaborative: ", isCollaborative);
         if (userLoading) return;
         if (!isCollaborative) {
             if (user?._id) {
@@ -103,7 +96,6 @@ function useNote(options = {}) {
         }
         else {
             if (sessionId) {
-                console.log("Fetching notes for session: ", sessionId);
                 fetchSessionNotes();
             }
 
@@ -127,14 +119,13 @@ function useNote(options = {}) {
                 })
             }
             else {
-                socket.emit("note-updated", { note: newNote, sessionId }); //emitting the updated note to the backend so that it can be broadcasted to other users in the session
+                socket.emit("note-updated", { note: newNote, sessionId }); 
             }
         } catch (error) {
             if (error.message === "Session expired") {
                 navigate("/login");
                 return;
             }
-            console.log("Error:", error.message);
             setError(error.message);
         }
     }

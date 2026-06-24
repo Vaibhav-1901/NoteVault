@@ -114,9 +114,9 @@ function Auth({ standalone = true }) {
     };
 
     const card = <div className="relative z-10 w-full max-w-sm px-10 py-8 bg-[#141414] border border-[#222] rounded-xl">
-        {/* Logo */}
+     
         <div className="font-mono text-xl tracking-tight mb-9">notes</div>
-        {/* Tabs */}
+     
         <div className="flex border-b border-[#222] mb-8 ">
             {["login", "register"].map((tab) => (
                 <button
@@ -132,7 +132,6 @@ function Auth({ standalone = true }) {
             ))}
         </div>
 
-        {/* Fields */}
         {mode === "register" && (
             <div className="mb-4">
                 <label className="block font-mono text-[10px] uppercase tracking-widest text-[#555] mb-2">username</label>
@@ -172,7 +171,6 @@ function Auth({ standalone = true }) {
             />
         </div>
 
-        {/* Submit */}
         <button
             onClick={handleSubmit}
             disabled={loading}
@@ -181,14 +179,12 @@ function Auth({ standalone = true }) {
             {loading ? "please wait..." : mode === "login" ? "sign in" : "create account"}
         </button>
 
-        {/* Error */}
         {error && (
             <div className="mt-4 px-3.5 py-2.5 bg-[#1a1010] border border-[#3a1f1f] rounded-md font-mono text-xs text-[#e07070]">
                 {error}
             </div>
         )}
 
-        {/* Footer */}
         <div className="mt-7 font-mono text-xs text-[#444] text-center">
             {mode === "login" ? (
                 <>no account?{" "}
@@ -215,7 +211,6 @@ function Auth({ standalone = true }) {
                 background: 'radial-gradient(ellipse at top, #111 0%, #0a0a0a 50%, #000 100%)',
             }}
         >
-            {/* Glow blob */}
             <div className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full opacity-10"
                 style={{ background: 'radial-gradient(ellipse, rgba(255,255,255,0.06) 0%, transparent 70%)' }}
             />
