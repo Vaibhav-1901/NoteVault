@@ -19,7 +19,7 @@ function Home() {
     const [sidebarVisible, setSidebarVisible] = useState(true);
     const { user, userloading } = useUser();
     const navigate = useNavigate();
-    if(!user){
+    if (!user) {
         navigate("/login")
     }
     const [activeTag, setActiveTag] = useState("all");
@@ -139,20 +139,26 @@ function Home() {
             console.error("Logout error:", error);
         }
     }
-      if (error) {
+    if (error) {
         return (
             <div className='bg-black text-red-700'>
                 ⚠️ Error loading notes:{error}
             </div>
         )
     }
-  
+
 
     return (
         <>
             <div className="flex h-screen bg-[#111111] text-[#e0e0e0] overflow-hidden font-mono fade-in w-full ">
                 {sidebarVisible && (
-                    <aside className='fade-in w-55 md:min-w-85 md:w-85 bg-[#131313] border-r border-[#1f1f1f] flex flex-col h-screen overflow-hidden'>
+                    <div
+                        className="fixed inset-0 z-30  md:hidden"
+                        onClick={() => setSidebarVisible(false)}
+                    />
+                )}
+                {sidebarVisible && (
+                    <aside className=' fade-in fixed inset-y-0 left-0 z-40  w-65 md:static md:z-auto md:w-85 md:min-w-85 bg-[#131313] border-r border-[#1f1f1f] flex flex-col h-screen overflow-hidden'>
                         {/* App header */}
                         <div className='flex items-center justify-between px-4 pt-4.5 pb-3'>
                             <div className='flex gap-2 items-center justify-center md:block md:gap-0'>
@@ -295,7 +301,7 @@ function Home() {
                     </aside>
                 )}
                 {/* Main Full Note */}
-                <main className='flex-1 flex flex-col h-full  overflow-hidden relative  '>
+                <main className='flex-1 flex flex-col h-full w-full overflow-hidden relative  '>
                     {/* UserHeader */}
 
 
@@ -425,8 +431,8 @@ function Home() {
                         <SessionMembers />
                     </div>
                 )}
-                <CollabControls openModal={() => setShowCollabModal(true)} isOpen={showSessionMembers} toggleSessionMembers={() => setShowSessionMembers((prev) => !prev)} />
-                <ToastContainer  toasts={toasts} />
+                <CollabControls openModal={() => setShowCollabModal(true)} isOpen={showSessionMembers} toggleSessionMembers={() => setShowSessionMembers((prev) => !prev)} sidebarVisible={sidebarVisible} />
+                <ToastContainer toasts={toasts} />
             </div>
         </>
     )

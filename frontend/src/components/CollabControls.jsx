@@ -7,7 +7,7 @@ import socket from '../socket/socket.js';
 
 
 
-function CollabControls({ openModal, isOpen, toggleSessionMembers }) {
+function CollabControls({ openModal, isOpen, toggleSessionMembers, sidebarVisible }) {
     const { sessionId, allMembers, onlineMembers, setSessionId, setAllMembers, setOnlineMembers } = useCollab();
     const { user } = useUser();
     const {show}=useToast();
@@ -22,7 +22,7 @@ function CollabControls({ openModal, isOpen, toggleSessionMembers }) {
         })
     }
     return (
-        <div className="fixed bottom-9 right-5 z-50 flex flex-col items-stretch w-[220px]">
+        <div className={`md:fixed ${sidebarVisible ? "hidden" : "fixed"} bottom-5 right-5 z-50 flex flex-col items-stretch w-[220px]`}>
             {!sessionId ? (
                 <button
                     onClick={openModal}

@@ -134,7 +134,7 @@ function CollabModal({ onClose }) {
 
     }
     const handleCopy = async () => {
-        await navigator.clipboard.writeText(sessionId);
+        await navigator.clipboard.writeText(inputSessionId);
         setCopied(true);
     }
 

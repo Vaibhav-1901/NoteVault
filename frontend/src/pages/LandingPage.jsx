@@ -96,7 +96,7 @@ function LandingPage() {
                     </div>
                 </div>
             </section>
-            <section id="how-it-works" className="py-10 px-20">
+            <section id="how-it-works" className="py-10 px-4 md:px-20">
                 <div className="max-w-7xl mx-auto w-full">
                     <div className="ml-[22px] text-xl uppercase tracking-[0.25em] text-white/20 mb-10">
                         GET STARTED
@@ -104,7 +104,7 @@ function LandingPage() {
 
                     <div className="border border-white/6 rounded-2xl bg-[#0c0c0d] overflow-hidden">
                         {/* Steps */}
-                        <div className="divide-y flex flex-col gap-10 divide-white/5">
+                        <div className="divide-y flex  flex-col gap-10 divide-white/5">
                             {[
                                 {
                                     step: "01",
@@ -128,7 +128,7 @@ function LandingPage() {
                                     output: "> 3 joined. edits syncing."
                                 }
                             ].map((item) => (
-                                <div key={item.step} className="grid grid-cols-1  md:grid-cols-[80px_1fr_1fr]  gap-8 px-8 py-7 group hover:bg-white/[0.02] transition-colors duration-200">
+                                <div key={item.step} className="grid grid-cols-1   md:grid-cols-[80px_1fr_1fr]  gap-8 px-8 py-7 group hover:bg-white/[0.02] transition-colors duration-200">
                                     {/* Step number */}
                                     <span className="text-[42px] font-bold text-white/5 leading-none select-none group-hover:text-white/8 transition-colors">
                                         {item.step}
@@ -153,7 +153,7 @@ function LandingPage() {
             </section>
 
             {/* ── Features ── */}
-            <section id="features" className=" py-10 flex flex-col px-20 ">
+            <section id="features" className=" py-10 flex flex-col px-4 md:px-20 ">
                 <div className="max-w-7xl mx-auto">
                     <div className=" ml-[22px] text-xl uppercase tracking-[0.25em] text-white/20 mb-6">
                         Everything you need to write <span className="text-white">together</span>.
