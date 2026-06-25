@@ -20,6 +20,7 @@ app.use(cookieParser());
 app.use("/api/notes", noteRouter);
 app.use("/api/users", userRouter);
 app.get("/health", (req, res) => {
+  console.log("Ping received");
   res.status(200).json({ status: "ok" });
 })
 
